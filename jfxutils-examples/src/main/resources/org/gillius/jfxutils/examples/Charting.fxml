@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.shape.*?>
+
+<!--
+  ~ Copyright 2013 Jason Winnebeck
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<BorderPane prefHeight="-1.0" prefWidth="-1.0" xmlns:fx="http://javafx.com/fxml" fx:controller="org.gillius.jfxutils.examples.Charting">
+  <bottom>
+    <VBox prefHeight="-1.0" prefWidth="-1.0">
+      <children>
+        <Slider fx:id="valueSlider" showTickLabels="true" showTickMarks="true" value="50.0" />
+        <Label fx:id="outputLabel" text="Label" />
+      </children>
+    </VBox>
+  </bottom>
+  <center>
+    <StackPane fx:id="chartPane" alignment="CENTER">
+      <LineChart fx:id="chart" animated="false" legendVisible="false">
+        <xAxis>
+          <NumberAxis animated="false" side="BOTTOM" />
+        </xAxis>
+        <yAxis>
+          <NumberAxis animated="false" side="LEFT" />
+        </yAxis>
+      </LineChart>
+      <Rectangle fx:id="selectRect" fill="DODGERBLUE" height="0.0" mouseTransparent="true" opacity="0.3" stroke="#002966" strokeType="INSIDE" strokeWidth="3.0" width="0.0" x="0.0" y="0.0" StackPane.alignment="TOP_LEFT" />
+    </StackPane>
+	  <LineChart fx:id="chart" animated="false" legendVisible="false">
+		  <xAxis>
+			  <NumberAxis animated="false" side="BOTTOM" />
+		  </xAxis>
+		  <yAxis>
+			  <NumberAxis animated="false" side="LEFT" />
+		  </yAxis>
+	  </LineChart>
+  </center>
+  <top>
+    <FlowPane alignment="TOP_CENTER" hgap="8.0" prefHeight="-1.0" prefWidth="-1.0" style="-fx-padding:8px;" vgap="8.0">
+      <children>
+        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#toggleAdd" style="&#10;" text="Start/Stop add" />
+      </children>
+    </FlowPane>
+  </top>
+</BorderPane>
