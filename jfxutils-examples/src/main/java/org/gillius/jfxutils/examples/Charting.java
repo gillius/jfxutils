@@ -45,9 +45,6 @@ public class Charting extends Application {
 	@FXML
 	private LineChart<Number, Number> chart;
 
-//	@FXML
-//	private Pane chartPane;
-
 	@FXML
 	private Slider valueSlider;
 
@@ -59,9 +56,6 @@ public class Charting extends Application {
 	private long startTime;
 
 	private Timeline addDataTimeline;
-
-//	@FXML
-//	private Rectangle selectRect;
 
 	@FXML
 	void addSample() {
@@ -133,12 +127,6 @@ public class Charting extends Application {
 				) );
 			}
 		} );
-
-//		ChartZoomManager zoomManager = new ChartZoomManager( chartPane, selectRect,
-//		                                                     (ValueAxis<?>) chart.getXAxis(),
-//		                                                     (ValueAxis<?>) chart.getYAxis() );
-//
-//		zoomManager.start();
 
 		JFXUtil.setupZooming( chart );
 	}
