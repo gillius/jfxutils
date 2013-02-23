@@ -20,7 +20,6 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
-import javafx.scene.chart.ValueAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
@@ -215,9 +214,7 @@ public class JFXUtil {
 
 		chartPane.getChildren().addAll( chart, selectRect );
 
-		new ChartZoomManager( chartPane, selectRect,
-		                      (ValueAxis) chart.getXAxis(),
-		                      (ValueAxis) chart.getYAxis() ).start();
+		new ChartZoomManager( chartPane, selectRect, chart ).start();
 		return chartPane;
 	}
 }

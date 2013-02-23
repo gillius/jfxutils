@@ -67,9 +67,7 @@ import static org.gillius.jfxutils.JFXUtil.*;
  *
  * Example Java code in bound controller class:
  * <pre>
-ChartZoomManager zoomManager = new ChartZoomManager( chartPane, selectRect,
-                                                     (ValueAxis&lt;?&gt;) chart.getXAxis(),
-                                                     (ValueAxis&lt;?&gt;) chart.getYAxis() );
+ChartZoomManager zoomManager = new ChartZoomManager( chartPane, selectRect, chart );
 zoomManager.start();</pre>
  *
  * @author Jason Winnebeck
@@ -89,21 +87,21 @@ public class ChartZoomManager {
 	private final Rectangle selectRect;
 	private final ValueAxis<?> xAxis;
 	private final ValueAxis<?> yAxis;
+	private final XYChartInfo chartInfo;
 
 	/**
 	 * Construct a new ChartZoomManager. See {@link ChartZoomManager} documentation for normal usage.
 	 *
 	 * @param chartPane  A Pane which is the ancestor of all arguments
 	 * @param selectRect A Rectangle whose layoutX/Y makes it line up with the chart
-	 * @param xAxis      ValueAxis
-	 * @param yAxis      ValueAxis
+	 * @param chart      Chart to manage, where both X and Y axis are a {@link ValueAxis}.
 	 */
-	public ChartZoomManager( Pane chartPane, Rectangle selectRect, ValueAxis<?> xAxis,
-	                         ValueAxis<?> yAxis ) {
+	public ChartZoomManager( Pane chartPane, Rectangle selectRect, XYChart<?,?> chart ) {
 		this.chartPane = chartPane;
 		this.selectRect = selectRect;
-		this.xAxis = xAxis;
-		this.yAxis = yAxis;
+		this.xAxis = (ValueAxis<?>) chart.getXAxis();
+		this.yAxis = (ValueAxis<?>) chart.getYAxis();
+		chartInfo = new XYChartInfo( chart, chartPane );
 
 		handlerManager = new EventHandlerManager( chartPane );
 
@@ -156,7 +154,7 @@ public class ChartZoomManager {
 		double x = mouseEvent.getX();
 		double y = mouseEvent.getY();
 
-		Rectangle2D plotArea = getPlotArea();
+		Rectangle2D plotArea = chartInfo.getPlotArea();
 
 		if ( plotArea.contains( x, y ) ) {
 			selectRect.setTranslateX( x );
@@ -166,7 +164,7 @@ public class ChartZoomManager {
 			selecting.set( true );
 			selectMode = SelectMode.Both;
 
-		} else if ( getXAxisArea().contains( x, y ) ) {
+		} else if ( chartInfo.getXAxisArea().contains( x, y ) ) {
 			selectRect.setTranslateX( x );
 			selectRect.setTranslateY( plotArea.getMinY() );
 			rectX.set( x );
@@ -174,7 +172,7 @@ public class ChartZoomManager {
 			selecting.set( true );
 			selectMode = SelectMode.Horizontal;
 
-		} else if ( getYAxisArea().contains( x, y ) ) {
+		} else if ( chartInfo.getYAxisArea().contains( x, y ) ) {
 			selectRect.setTranslateX( plotArea.getMinX() );
 			selectRect.setTranslateY( y );
 			rectX.set( plotArea.getMaxX() );
@@ -188,7 +186,7 @@ public class ChartZoomManager {
 		if ( !selecting.get() )
 			return;
 
-		Rectangle2D plotArea = getPlotArea();
+		Rectangle2D plotArea = chartInfo.getPlotArea();
 
 		if ( selectMode == SelectMode.Both || selectMode == SelectMode.Horizontal ) {
 			double x = mouseEvent.getX();
@@ -242,54 +240,5 @@ public class ChartZoomManager {
 		yAxis.setUpperBound( yStartVal );
 
 		selecting.set( false );
-	}
-
-	/**
-	 * Returns true if the given x and y coordinate in the chartPane's coordinate system is in the
-	 * chart's plot area, based on the xAxis and yAxis locations. This method works regardless of
-	 * the started/stopped state.
-	 */
-	public boolean isInPlotArea( double x, double y ) {
-		return getPlotArea().contains( x, y );
-	}
-
-	/**
-	 * Returns the plot area in the chartPane's coordinate space. This method works regardless of
-	 * the started/stopped state.
-	 */
-	public Rectangle2D getPlotArea() {
-		double xStart = getXShift( xAxis, chartPane );
-		double yStart = getYShift( yAxis, chartPane );
-
-		//If the direct method to get the width (which is based on its Node dimensions) is not found to
-		//be appropriate, an alternative method is commented.
-//		double width = xAxis.getDisplayPosition( xAxis.toRealValue( xAxis.getUpperBound() ) );
-		double width = xAxis.getWidth();
-//		double height = yAxis.getDisplayPosition( yAxis.toRealValue( yAxis.getLowerBound() ) );
-		double height = yAxis.getHeight();
-
-		return new Rectangle2D( xStart, yStart, width, height );
-	}
-
-	/**
-	 * Returns the X axis area in the chartPane's coordinate space. This method works regardless of
-	 * the started/stopped state.
-	 */
-	public Rectangle2D getXAxisArea() {
-		double xStart = getXShift( xAxis, chartPane );
-		double yStart = getYShift( xAxis, chartPane );
-
-		return new Rectangle2D( xStart, yStart, xAxis.getWidth(), xAxis.getHeight() );
-	}
-
-	/**
-	 * Returns the Y axis area in the chartPane's coordinate space. This method works regardless of
-	 * the started/stopped state.
-	 */
-	public Rectangle2D getYAxisArea() {
-		double xStart = getXShift( yAxis, chartPane );
-		double yStart = getYShift( yAxis, chartPane );
-
-		return new Rectangle2D( xStart, yStart, yAxis.getWidth(), yAxis.getHeight() );
 	}
 }
