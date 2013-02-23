@@ -8,7 +8,6 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.paint.*?>
 <?import javafx.scene.shape.*?>
-
 <!--
   ~ Copyright 2013 Jason Winnebeck
   ~
@@ -35,20 +34,28 @@
     </VBox>
   </bottom>
   <center>
-	  <LineChart fx:id="chart" animated="true" legendVisible="false">
-		  <xAxis>
-			  <NumberAxis animated="true" side="BOTTOM" />
-		  </xAxis>
-		  <yAxis>
-			  <NumberAxis animated="true" side="LEFT" />
-		  </yAxis>
-	  </LineChart>
+    <LineChart fx:id="chart" animated="true" legendVisible="false">
+      <xAxis>
+        <NumberAxis animated="true" side="BOTTOM" />
+      </xAxis>
+      <yAxis>
+        <NumberAxis animated="true" side="LEFT" />
+      </yAxis>
+    </LineChart>
   </center>
   <top>
-    <FlowPane alignment="TOP_CENTER" hgap="8.0" prefHeight="-1.0" prefWidth="-1.0" style="-fx-padding:8px;" vgap="8.0">
-      <children>
-        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#toggleAdd" style="&#10;" text="Start/Stop add" />
-      </children>
-    </FlowPane>
+    <VBox>
+      <FlowPane alignment="TOP_CENTER" hgap="8.0" prefHeight="-1.0" prefWidth="-1.0" style="-fx-padding:8px;" vgap="8.0">
+        <children>
+          <Button mnemonicParsing="true" onAction="#toggleAdd" text="_Start/Stop Add" />
+          <Button mnemonicParsing="true" onAction="#autoZoom" text="Auto _Zoom" />
+        </children>
+      </FlowPane>
+      <FlowPane columnHalignment="LEFT" prefHeight="-1.0" prefWidth="-1.0" style="-fx-padding:8px;" VBox.vgrow="NEVER">
+        <children>
+          <Label alignment="CENTER_LEFT" text="Zoom with left mouse. Pan with right mouse or left+ctrl (or left+cmd on Mac)" />
+        </children>
+      </FlowPane>
+    </VBox>
   </top>
 </BorderPane>

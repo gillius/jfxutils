@@ -66,6 +66,12 @@ public class Charting extends Application {
 	}
 
 	@FXML
+	void autoZoom() {
+		chart.getXAxis().setAutoRanging( true );
+		chart.getYAxis().setAutoRanging( true );
+	}
+
+	@FXML
 	void toggleAdd() {
 		switch ( addDataTimeline.getStatus() ) {
 			case PAUSED:
