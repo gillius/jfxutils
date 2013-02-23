@@ -18,10 +18,12 @@ package org.gillius.jfxutils;
 
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.chart.ValueAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Rectangle;
@@ -71,6 +73,18 @@ zoomManager.start();</pre>
  * @author Jason Winnebeck
  */
 public class ChartZoomManager {
+	/**
+	 * The default mouse filter for the {@link ChartZoomManager} filters events unless only primary
+	 * mouse button is depressed.
+	 */
+	public static final EventHandler<MouseEvent> DEFAULT_FILTER = new EventHandler<MouseEvent>() {
+		@Override
+		public void handle( MouseEvent mouseEvent ) {
+			if ( mouseEvent.getButton() != MouseButton.PRIMARY )
+				mouseEvent.consume();
+		}
+	};
+
 	private final SimpleDoubleProperty rectX = new SimpleDoubleProperty();
 	private final SimpleDoubleProperty rectY = new SimpleDoubleProperty();
 	private final SimpleBooleanProperty selecting = new SimpleBooleanProperty( false );
@@ -78,6 +92,8 @@ public class ChartZoomManager {
 	private static enum SelectMode { Horizontal, Vertical, Both }
 
 	private SelectMode selectMode;
+
+	private EventHandler<? super MouseEvent> mouseFilter = DEFAULT_FILTER;
 
 	private final EventHandlerManager handlerManager;
 
@@ -104,20 +120,23 @@ public class ChartZoomManager {
 		handlerManager.addEventHandler( false, MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
 			@Override
 			public void handle( MouseEvent mouseEvent ) {
-				onMousePressed( mouseEvent );
+				if ( passesFilter( mouseEvent ) )
+					onMousePressed( mouseEvent );
 			}
 		} );
 
 		handlerManager.addEventHandler( false, MouseEvent.DRAG_DETECTED, new EventHandler<MouseEvent>() {
 			@Override
 			public void handle( MouseEvent mouseEvent ) {
-				onDragStart( mouseEvent );
+				if ( passesFilter( mouseEvent ) )
+					onDragStart( mouseEvent );
 			}
 		} );
 
 		handlerManager.addEventHandler( false, MouseEvent.MOUSE_DRAGGED, new EventHandler<MouseEvent>() {
 			@Override
 			public void handle( MouseEvent mouseEvent ) {
+				//Don't check filter here, we're either already started, or not
 				onMouseDragged( mouseEvent );
 			}
 		} );
@@ -125,9 +144,29 @@ public class ChartZoomManager {
 		handlerManager.addEventHandler( false, MouseEvent.MOUSE_RELEASED, new EventHandler<MouseEvent>() {
 			@Override
 			public void handle( MouseEvent mouseEvent ) {
+				//Don't check filter here, we're either already started, or not
 				onMouseReleased();
 			}
 		} );
+	}
+
+	/**
+	 * Returns the mouse filter.
+	 *
+	 * @see #setMouseFilter(EventHandler)
+	 */
+	public EventHandler<? super MouseEvent> getMouseFilter() {
+		return mouseFilter;
+	}
+
+	/**
+	 * Sets the mouse filter for starting the zoom action. If the filter consumes the event with
+	 * {@link Event#consume()}, then the event is ignored. If the filter is null, all events are
+	 * passed through. The default filter is one that listens only while the primary mouse button is
+	 * depressed.
+	 */
+	public void setMouseFilter( EventHandler<? super MouseEvent> mouseFilter ) {
+		this.mouseFilter = mouseFilter;
 	}
 
 	/**
@@ -151,6 +190,17 @@ public class ChartZoomManager {
 		selectRect.widthProperty().unbind();
 		selectRect.heightProperty().unbind();
 		selectRect.visibleProperty().unbind();
+	}
+
+	private boolean passesFilter( MouseEvent event ) {
+		if ( mouseFilter != null ) {
+			MouseEvent cloned = (MouseEvent) event.clone();
+			mouseFilter.handle( cloned );
+			if ( cloned.isConsumed() )
+				return false;
+		}
+
+		return true;
 	}
 
 	private void onMousePressed( MouseEvent mouseEvent ) {
