@@ -19,7 +19,7 @@
 
 	<groupId>org.gillius</groupId>
 	<artifactId>jfxutils-parent</artifactId>
-	<version>0.2-SNAPSHOT</version>
+	<version>0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>JFXUtils Parent</name>
@@ -56,9 +56,8 @@
 	</developers>
 
 	<scm>
-		<connection>scm:git:git@github.com:gillius/jfxutils.git</connection>
-	  <tag>HEAD</tag>
-  </scm>
+		<connection>scm:git:https://github.com/gillius/jfxutils.git</connection>
+	</scm>
 
 	<distributionManagement>
 		<downloadUrl>http://www.gillius.org/maven2</downloadUrl>
