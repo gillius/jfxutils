@@ -57,6 +57,7 @@
 
 	<scm>
 		<connection>scm:git:https://github.com/gillius/jfxutils.git</connection>
+		<developerConnection>scm:git:git@github.com:gillius/jfxutils.git</developerConnection>
 	</scm>
 
 	<distributionManagement>
@@ -70,6 +71,14 @@
 	</distributionManagement>
 
 	<build>
+		<extensions>
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-ssh</artifactId>
+				<version>2.4</version>
+			</extension>
+		</extensions>
+
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
