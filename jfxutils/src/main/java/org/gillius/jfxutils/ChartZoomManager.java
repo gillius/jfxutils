@@ -81,7 +81,6 @@ public class ChartZoomManager {
 
 	private final EventHandlerManager handlerManager;
 
-	private final Pane chartPane;
 	private final Rectangle selectRect;
 	private final ValueAxis<?> xAxis;
 	private final ValueAxis<?> yAxis;
@@ -95,7 +94,6 @@ public class ChartZoomManager {
 	 * @param chart      Chart to manage, where both X and Y axis are a {@link ValueAxis}.
 	 */
 	public ChartZoomManager( Pane chartPane, Rectangle selectRect, XYChart<?,?> chart ) {
-		this.chartPane = chartPane;
 		this.selectRect = selectRect;
 		this.xAxis = (ValueAxis<?>) chart.getXAxis();
 		this.yAxis = (ValueAxis<?>) chart.getYAxis();
@@ -107,6 +105,13 @@ public class ChartZoomManager {
 			@Override
 			public void handle( MouseEvent mouseEvent ) {
 				onMousePressed( mouseEvent );
+			}
+		} );
+
+		handlerManager.addEventHandler( false, MouseEvent.DRAG_DETECTED, new EventHandler<MouseEvent>() {
+			@Override
+			public void handle( MouseEvent mouseEvent ) {
+				onDragStart( mouseEvent );
 			}
 		} );
 
@@ -159,7 +164,6 @@ public class ChartZoomManager {
 			selectRect.setTranslateY( y );
 			rectX.set( x );
 			rectY.set( y );
-			selecting.set( true );
 			selectMode = SelectMode.Both;
 
 		} else if ( chartInfo.getXAxisArea().contains( x, y ) ) {
@@ -167,7 +171,6 @@ public class ChartZoomManager {
 			selectRect.setTranslateY( plotArea.getMinY() );
 			rectX.set( x );
 			rectY.set( plotArea.getMaxY() );
-			selecting.set( true );
 			selectMode = SelectMode.Horizontal;
 
 		} else if ( chartInfo.getYAxisArea().contains( x, y ) ) {
@@ -175,9 +178,14 @@ public class ChartZoomManager {
 			selectRect.setTranslateY( y );
 			rectX.set( plotArea.getMaxX() );
 			rectY.set( y );
-			selecting.set( true );
 			selectMode = SelectMode.Vertical;
 		}
+	}
+
+	private void onDragStart( MouseEvent mouseEvent ) {
+		//Don't actually start the selecting process until it's officially a drag
+		//But, we saved the original coordinates from where we started.
+		selecting.set( true );
 	}
 
 	private void onMouseDragged( MouseEvent mouseEvent ) {
