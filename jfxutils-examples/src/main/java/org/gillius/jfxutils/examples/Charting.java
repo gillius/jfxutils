@@ -71,9 +71,17 @@ public class Charting extends Application {
 				addDataTimeline.play();
 				chart.getXAxis().setAutoRanging( true );
 				chart.getYAxis().setAutoRanging( true );
+				//Animation looks horrible if we're updating a lot
+				chart.setAnimated( false );
+				chart.getXAxis().setAnimated( false );
+				chart.getYAxis().setAnimated( false );
 				break;
 			case RUNNING:
 				addDataTimeline.stop();
+				//Return the animation since we're not updating a lot
+				chart.setAnimated( true );
+				chart.getXAxis().setAnimated( true );
+				chart.getYAxis().setAnimated( true );
 				break;
 
 			default:

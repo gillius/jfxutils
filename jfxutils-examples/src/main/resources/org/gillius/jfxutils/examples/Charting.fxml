@@ -35,23 +35,12 @@
     </VBox>
   </bottom>
   <center>
-    <StackPane fx:id="chartPane" alignment="CENTER">
-      <LineChart fx:id="chart" animated="false" legendVisible="false">
-        <xAxis>
-          <NumberAxis animated="false" side="BOTTOM" />
-        </xAxis>
-        <yAxis>
-          <NumberAxis animated="false" side="LEFT" />
-        </yAxis>
-      </LineChart>
-      <Rectangle fx:id="selectRect" fill="DODGERBLUE" height="0.0" mouseTransparent="true" opacity="0.3" stroke="#002966" strokeType="INSIDE" strokeWidth="3.0" width="0.0" x="0.0" y="0.0" StackPane.alignment="TOP_LEFT" />
-    </StackPane>
-	  <LineChart fx:id="chart" animated="false" legendVisible="false">
+	  <LineChart fx:id="chart" animated="true" legendVisible="false">
 		  <xAxis>
-			  <NumberAxis animated="false" side="BOTTOM" />
+			  <NumberAxis animated="true" side="BOTTOM" />
 		  </xAxis>
 		  <yAxis>
-			  <NumberAxis animated="false" side="LEFT" />
+			  <NumberAxis animated="true" side="LEFT" />
 		  </yAxis>
 	  </LineChart>
   </center>
