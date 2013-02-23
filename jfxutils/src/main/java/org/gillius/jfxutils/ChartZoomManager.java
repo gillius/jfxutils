@@ -26,8 +26,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Rectangle;
 
-import static org.gillius.jfxutils.JFXUtil.*;
-
 /**
  * ChartZoomManager manages a zooming selection rectangle and the bounds of the graph. It can be
  * enabled via {@link #start()} and disabled via {@link #stop()}. The normal usage is to create a
@@ -218,26 +216,17 @@ public class ChartZoomManager {
 			return;
 		}
 
-		double xStart = getXShift( xAxis, chartPane );
-		double xStartVal =
-				xAxis.getValueForDisplay( selectRect.getTranslateX() - xStart ).doubleValue();
-		double xEndVal = xAxis.getValueForDisplay( rectX.get() - xStart ).doubleValue();
-
-		double yStart = getYShift( yAxis, chartPane );
-		double yStartVal =
-				yAxis.getValueForDisplay( selectRect.getTranslateY() - yStart ).doubleValue();
-		double yEndVal = yAxis.getValueForDisplay( rectY.get() - yStart ).doubleValue();
-
-//		System.out.printf( "Zooming, x=[%f, %f] y=[%f, %f]%n",
-//		                   xStartVal, xEndVal,
-//		                   yStartVal, yEndVal );
+		Rectangle2D zoomWindow = chartInfo.getDataCoordinates(
+				selectRect.getTranslateX(), selectRect.getTranslateY(),
+				rectX.get(), rectY.get()
+		);
 
 		xAxis.setAutoRanging( false );
-		xAxis.setLowerBound( xStartVal );
-		xAxis.setUpperBound( xEndVal );
+		xAxis.setLowerBound( zoomWindow.getMinX() );
+		xAxis.setUpperBound( zoomWindow.getMaxX() );
 		yAxis.setAutoRanging( false );
-		yAxis.setLowerBound( yEndVal );
-		yAxis.setUpperBound( yStartVal );
+		yAxis.setLowerBound( zoomWindow.getMinY() );
+		yAxis.setUpperBound( zoomWindow.getMaxY() );
 
 		selecting.set( false );
 	}
