@@ -75,11 +75,12 @@ zoomManager.start();</pre>
 public class ChartZoomManager {
 	/**
 	 * The default mouse filter for the {@link ChartZoomManager} filters events unless only primary
-	 * mouse button is depressed.
+	 * mouse button (usually left) is depressed.
 	 */
 	public static final EventHandler<MouseEvent> DEFAULT_FILTER = new EventHandler<MouseEvent>() {
 		@Override
 		public void handle( MouseEvent mouseEvent ) {
+			//The ChartPanManager uses this reference, so if behavior changes, copy to users first.
 			if ( mouseEvent.getButton() != MouseButton.PRIMARY )
 				mouseEvent.consume();
 		}
@@ -162,8 +163,7 @@ public class ChartZoomManager {
 	/**
 	 * Sets the mouse filter for starting the zoom action. If the filter consumes the event with
 	 * {@link Event#consume()}, then the event is ignored. If the filter is null, all events are
-	 * passed through. The default filter is one that listens only while the primary mouse button is
-	 * depressed.
+	 * passed through. The default filter is {@link #DEFAULT_FILTER}.
 	 */
 	public void setMouseFilter( EventHandler<? super MouseEvent> mouseFilter ) {
 		this.mouseFilter = mouseFilter;

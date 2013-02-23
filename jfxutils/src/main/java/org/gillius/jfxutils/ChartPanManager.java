@@ -16,6 +16,7 @@
 
 package org.gillius.jfxutils;
 
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.chart.ValueAxis;
 import javafx.scene.chart.XYChart;
@@ -28,10 +29,18 @@ import javafx.scene.input.MouseEvent;
  * @author Jason Winnebeck
  */
 public class ChartPanManager {
+	/**
+	 * The default mouse filter for the {@link ChartPanManager} filters events unless only primary
+	 * mouse button (usually left) is depressed.
+	 */
+	public static final EventHandler<MouseEvent> DEFAULT_FILTER = ChartZoomManager.DEFAULT_FILTER;
+
 	private final EventHandlerManager handlerManager;
 
 	private final ValueAxis<?> xAxis;
 	private final ValueAxis<?> yAxis;
+
+	private EventHandler<? super MouseEvent> mouseFilter = DEFAULT_FILTER;
 
 	private boolean dragging = false;
 
@@ -49,7 +58,8 @@ public class ChartPanManager {
 		handlerManager.addEventHandler( false, MouseEvent.DRAG_DETECTED, new EventHandler<MouseEvent>() {
 			@Override
 			public void handle( MouseEvent mouseEvent ) {
-				startDrag( mouseEvent );
+				if ( passesFilter( mouseEvent ) )
+					startDrag( mouseEvent );
 			}
 		} );
 
@@ -68,6 +78,24 @@ public class ChartPanManager {
 		} );
 	}
 
+	/**
+	 * Returns the mouse filter.
+	 *
+	 * @see #setMouseFilter(EventHandler)
+	 */
+	public EventHandler<? super MouseEvent> getMouseFilter() {
+		return mouseFilter;
+	}
+
+	/**
+	 * Sets the mouse filter for starting the pan action. If the filter consumes the event with
+	 * {@link Event#consume()}, then the event is ignored. If the filter is null, all events are
+	 * passed through. The default filter is {@link #DEFAULT_FILTER}.
+	 */
+	public void setMouseFilter( EventHandler<? super MouseEvent> mouseFilter ) {
+		this.mouseFilter = mouseFilter;
+	}
+
 	public void start() {
 		handlerManager.addAllHandlers();
 	}
@@ -75,6 +103,17 @@ public class ChartPanManager {
 	public void stop() {
 		handlerManager.removeAllHandlers();
 		release();
+	}
+
+	private boolean passesFilter( MouseEvent event ) {
+		if ( mouseFilter != null ) {
+			MouseEvent cloned = (MouseEvent) event.clone();
+			mouseFilter.handle( cloned );
+			if ( cloned.isConsumed() )
+				return false;
+		}
+
+		return true;
 	}
 
 	private void startDrag( MouseEvent event ) {

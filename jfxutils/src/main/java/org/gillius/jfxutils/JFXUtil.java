@@ -17,10 +17,12 @@
 package org.gillius.jfxutils;
 
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.chart.XYChart;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
@@ -179,6 +181,14 @@ public class JFXUtil {
 	}
 
 	/**
+	 * Sets up zooming via the {@link #setupZooming(XYChart, EventHandler)} method by using the
+	 * {@link ChartZoomManager}'s {@link ChartZoomManager#DEFAULT_FILTER default filter}.
+	 */
+	public static Region setupZooming( XYChart<?, ?> chart ) {
+		return setupZooming( chart, ChartZoomManager.DEFAULT_FILTER );
+	}
+
+	/**
 	 * Convenience method for simple and default setup of zooming on an {@link XYChart} via a
 	 * {@link ChartZoomManager}. Wraps the chart in the components required to implement zooming. The
 	 * current implementation wraps the chart in a StackPane, which has the chart and a blue
@@ -195,9 +205,12 @@ public class JFXUtil {
 	 * {@link BorderPane}s. If it's not found to be reliable, then create the wrapping components
 	 * yourself (such as in the FXML), or setup zooming before adding it to a parent.
 	 *
+	 * @param mouseFilter EventHandler that consumes events that should not trigger a zoom action
+	 *
 	 * @return The top-level Region
 	 */
-	public static Region setupZooming( XYChart<?, ?> chart ) {
+	public static Region setupZooming( XYChart<?, ?> chart,
+	                                   EventHandler<? super MouseEvent> mouseFilter ) {
 		StackPane chartPane = new StackPane();
 
 		if ( chart.getParent() != null )
@@ -214,7 +227,9 @@ public class JFXUtil {
 
 		chartPane.getChildren().addAll( chart, selectRect );
 
-		new ChartZoomManager( chartPane, selectRect, chart ).start();
+		ChartZoomManager zoomManager = new ChartZoomManager( chartPane, selectRect, chart );
+		zoomManager.setMouseFilter( mouseFilter );
+		zoomManager.start();
 		return chartPane;
 	}
 }

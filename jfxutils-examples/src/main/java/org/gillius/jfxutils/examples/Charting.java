@@ -30,11 +30,13 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import org.gillius.jfxutils.ChartPanManager;
 import org.gillius.jfxutils.JFXUtil;
 
 public class Charting extends Application {
@@ -136,6 +138,31 @@ public class Charting extends Application {
 			}
 		} );
 
-		JFXUtil.setupZooming( chart );
+		//Panning works via either secondary (right) mouse or primary with ctrl held down
+		ChartPanManager panner = new ChartPanManager( chart );
+		panner.setMouseFilter( new EventHandler<MouseEvent>() {
+			@Override
+			public void handle( MouseEvent mouseEvent ) {
+				if ( mouseEvent.getButton() == MouseButton.SECONDARY ||
+						 ( mouseEvent.getButton() == MouseButton.PRIMARY &&
+						   mouseEvent.isShortcutDown() ) ) {
+					System.out.println();
+					//let it through
+				} else {
+					mouseEvent.consume();
+				}
+			}
+		} );
+		panner.start();
+
+		//Zooming works only via primary mouse button without ctrl held down
+		JFXUtil.setupZooming( chart, new EventHandler<MouseEvent>() {
+			@Override
+			public void handle( MouseEvent mouseEvent ) {
+				if ( mouseEvent.getButton() != MouseButton.PRIMARY ||
+						 mouseEvent.isShortcutDown() )
+					mouseEvent.consume();
+			}
+		} );
 	}
 }
