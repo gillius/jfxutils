@@ -19,7 +19,7 @@
 
 	<groupId>org.gillius</groupId>
 	<artifactId>jfxutils-parent</artifactId>
-	<version>0.1</version>
+	<version>0.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>JFXUtils Parent</name>
@@ -56,8 +56,8 @@
 	</developers>
 
 	<scm>
-		<connection>scm:git:https://github.com/gillius/jfxutils.git</connection>
-	  <tag>0.1</tag>
+		<connection>scm:git:git@github.com:gillius/jfxutils.git</connection>
+	  <tag>HEAD</tag>
   </scm>
 
 	<distributionManagement>
