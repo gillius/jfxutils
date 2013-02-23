@@ -29,7 +29,7 @@ Maven - Latest Development Version
 <dependency>
   <groupId>org.gillius</groupId>
   <artifactId>jfxutils</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>0.1</version>
 </dependency>
 ```
 
