@@ -34,7 +34,7 @@
     </VBox>
   </bottom>
   <center>
-    <LineChart fx:id="chart" animated="true" legendVisible="false">
+    <LineChart fx:id="chart" alternativeColumnFillVisible="false" alternativeRowFillVisible="false" animated="true" horizontalGridLinesVisible="true" legendVisible="false">
       <xAxis>
         <NumberAxis animated="true" side="BOTTOM" />
       </xAxis>

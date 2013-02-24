@@ -105,6 +105,7 @@ public class Charting extends Application {
 		StackPane root = JFXUtil.createScalePane( contentRootRegion, 960, 540, false );
 		Scene scene = new Scene( root, root.getPrefWidth(), root.getPrefHeight() );
 		stage.setScene( scene );
+		stage.setTitle( "Charting Example" );
 		stage.show();
 	}
 
