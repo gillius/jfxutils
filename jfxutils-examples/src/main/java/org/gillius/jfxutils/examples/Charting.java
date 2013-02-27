@@ -117,7 +117,10 @@ public class Charting extends Application {
 		series.setName( "Data" );
 
 		chart.getData().add( series );
-		((NumberAxis)chart.getXAxis()).setForceZeroInRange( false );
+		if ( chart.getXAxis() instanceof NumberAxis ) {
+			NumberAxis xAxis = (NumberAxis) chart.getXAxis();
+			xAxis.setForceZeroInRange( false );
+		}
 
 		addDataTimeline = new Timeline( new KeyFrame(
 				Duration.millis( 250 ),
