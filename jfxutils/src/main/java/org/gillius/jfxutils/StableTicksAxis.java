@@ -16,13 +16,13 @@
 
 package org.gillius.jfxutils;
 
+import javafx.geometry.Dimension2D;
 import javafx.scene.chart.ValueAxis;
 
-import java.util.Arrays;
+import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import static java.util.Arrays.*;
 
 /**
  * StableTicksAxis is not ready to be used.
@@ -31,39 +31,53 @@ import static java.util.Arrays.*;
  */
 public class StableTicksAxis extends ValueAxis<Number> {
 
+	private final NumberFormat normalFormat = NumberFormat.getNumberInstance();
+	private final NumberFormat engFormat = NumberFormat.getNumberInstance();
+
+	private NumberFormat currFormat = normalFormat;
+
 	public StableTicksAxis() {
-		System.out.println( "StableTicksAxis.StableTicksAxis" );
 	}
 
 	public StableTicksAxis( double lowerBound, double upperBound ) {
 		super( lowerBound, upperBound );
-		System.out.println( "StableTicksAxis.StableTicksAxis" );
 	}
 
 	@Override
 	protected Object autoRange( double minValue, double maxValue, double length, double labelSize ) {
-		System.out.printf( "autoRange(%f, %f, %f, %f)%n",
-		                   minValue, maxValue, length, labelSize );
+//		System.out.printf( "autoRange(%f, %f, %f, %f)",
+//		                   minValue, maxValue, length, labelSize );
+		Range ret;
+		//noinspection FloatingPointEquality
+		if ( minValue == maxValue ) {
+			minValue = minValue - 1;
+			maxValue = maxValue + 1;
+		}
+		length = getLength();
 		double delta = maxValue - minValue;
-		double scale = length / ( maxValue - minValue );
+		double scale = calculateNewScale( length, minValue, maxValue );
 
-		int maxTicks = Math.max( 1, (int) ( length / labelSize ) );
+		int maxTicks = Math.max( 1, (int) ( length / getLabelSize() ) );
 
-		return new double[] { minValue, maxValue, scale };
+		ret = new Range( minValue, maxValue, calculateTickSpacing( delta, maxTicks ), scale );
+//		System.out.printf( " = %s%n", ret );
+		return ret;
 	}
 
 	private static final double[] dividers = new double[] { 1.0, 2.0, 5.0 };
 
 	public static double calculateTickSpacing( double delta, int maxTicks ) {
+		if ( delta == 0.0 )
+			return 0.0;
 		if ( delta <= 0.0 )
 			throw new IllegalArgumentException( "delta must be positive" );
 		if ( maxTicks < 1 )
 			throw new IllegalArgumentException( "must be at least one tick" );
 
-		//Take a guess that we'll space ticks at 1
-		int factor = 0;
+		//The factor will be close to the log10, this just optimizes the search
+		int factor = (int) Math.log10( delta );
 		int divider = 0;
-		int numTicks = (int) delta;
+		int numTicks = (int) (delta / ( dividers[divider] * Math.pow( 10, factor ) ));
 
 		//We don't have enough ticks, so increase ticks until we're over the limit, then back off once.
 		if ( numTicks < maxTicks ) {
@@ -104,41 +118,101 @@ public class StableTicksAxis extends ValueAxis<Number> {
 
 	@Override
 	protected List<Number> calculateMinorTickMarks() {
-		System.out.println( "StableTicksAxis.calculateMinorTickMarks" );
+//		System.out.println( "StableTicksAxis.calculateMinorTickMarks" );
 		return Collections.emptyList();
 	}
 
 	@Override
 	protected void setRange( Object range, boolean animate ) {
-		double[] rangeVal = (double[]) range;
-		System.out.format( "StableTicksAxis.setRange (%s, %s)%n",
-		                   Arrays.toString( rangeVal ),
-		                   animate );
-		setLowerBound( rangeVal[0] );
-		setUpperBound( rangeVal[1] );
-		currentLowerBound.set( rangeVal[0] );
-		setScale( rangeVal[2] );
+		Range rangeVal = (Range) range;
+//		System.out.format( "StableTicksAxis.setRange (%s, %s)%n",
+//		                   range, animate );
+		setLowerBound( rangeVal.low );
+		setUpperBound( rangeVal.high );
+		currentLowerBound.set( rangeVal.low );
+		setScale( rangeVal.scale );
+
+		//Set the number format. Pick a "normal" format unless the numbers are quite large or small.
+		currFormat = normalFormat;
+		double log10 = Math.log10( rangeVal.low );
+		if ( log10 < -4.0 || log10 > 5.0 ) {
+			currFormat = engFormat;
+		} else {
+			log10 = Math.log10( rangeVal.high );
+			if ( log10 < -4.0 || log10 > 5.0 ) {
+				currFormat = engFormat;
+			}
+		}
 	}
 
 	@Override
 	protected Object getRange() {
-		double[] ret = { getLowerBound(), getUpperBound() };
-		System.out.println( "StableTicksAxis.getRange = " + Arrays.toString( ret ) );
+		Object ret = autoRange( getLowerBound(), getUpperBound(), getLength(), getLabelSize() );
+//		System.out.println( "StableTicksAxis.getRange = " + ret );
 		return ret;
 	}
 
 	@Override
 	protected List<Number> calculateTickValues( double length, Object range ) {
-		double[] rangeVal = (double[]) range;
-		System.out.format( "StableTicksAxis.calculateTickValues (length=%f, range=%s)%n",
-		                   length,
-		                   Arrays.toString( rangeVal ) );
-		return asList( (Number) rangeVal[0], rangeVal[1] );
+		Range rangeVal = (Range) range;
+//		System.out.format( "StableTicksAxis.calculateTickValues (length=%f, range=%s)",
+//		                   length, rangeVal );
+		double firstTick = Math.ceil( rangeVal.low / rangeVal.tickSpacing ) * rangeVal.tickSpacing;
+		int numTicks = (int) (rangeVal.getDelta() / rangeVal.tickSpacing);
+		List<Number> ret = new ArrayList<Number>( numTicks + 1 );
+		for ( int i = 0; i <= numTicks; ++i ) {
+			ret.add( firstTick + rangeVal.tickSpacing * i );
+		}
+//		System.out.printf( " = %s%n", ret );
+		return ret;
 	}
 
 	@Override
 	protected String getTickMarkLabel( Number number ) {
-		System.out.println( "StableTicksAxis.getTickMarkLabel " + number );
-		return String.valueOf( number );
+		return currFormat.format( number );
+	}
+
+	private double getLength() {
+		if ( getSide().isHorizontal() )
+			return getWidth();
+		else
+			return getHeight();
+	}
+
+	private double getLabelSize() {
+		Dimension2D dim = measureTickMarkLabelSize( "-888.88E-88", getTickLabelRotation() );
+		if ( getSide().isHorizontal() ) {
+			return dim.getWidth();
+		} else {
+			return dim.getHeight();
+		}
+	}
+
+	private static class Range {
+		public double low;
+		public double high;
+		public double tickSpacing;
+		public double scale;
+
+		private Range( double low, double high, double tickSpacing, double scale ) {
+			this.low = low;
+			this.high = high;
+			this.tickSpacing = tickSpacing;
+			this.scale = scale;
+		}
+
+		public double getDelta() {
+			return high - low;
+		}
+
+		@Override
+		public String toString() {
+			return "Range{" +
+			       "low=" + low +
+			       ", high=" + high +
+			       ", tickSpacing=" + tickSpacing +
+			       ", scale=" + scale +
+			       '}';
+		}
 	}
 }

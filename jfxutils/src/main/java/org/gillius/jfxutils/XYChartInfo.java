@@ -95,6 +95,10 @@ public class XYChartInfo {
 	 */
 	@SuppressWarnings( "unchecked" )
 	public Rectangle2D getDataCoordinates( double minX, double minY, double maxX, double maxY ) {
+		if ( minX > maxX || minY > maxY ) {
+			throw new IllegalArgumentException( "min > max for X and/or Y" );
+		}
+
 		Axis xAxis = chart.getXAxis();
 		Axis yAxis = chart.getYAxis();
 

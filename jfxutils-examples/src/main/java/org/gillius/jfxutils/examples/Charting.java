@@ -156,7 +156,6 @@ public class Charting extends Application {
 				if ( mouseEvent.getButton() == MouseButton.SECONDARY ||
 						 ( mouseEvent.getButton() == MouseButton.PRIMARY &&
 						   mouseEvent.isShortcutDown() ) ) {
-					System.out.println();
 					//let it through
 				} else {
 					mouseEvent.consume();

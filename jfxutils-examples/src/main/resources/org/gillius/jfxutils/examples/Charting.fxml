@@ -41,7 +41,7 @@
         <StableTicksAxis animated="true" side="BOTTOM" />
       </xAxis>
       <yAxis>
-        <NumberAxis animated="true" side="LEFT" />
+        <StableTicksAxis animated="true" side="LEFT" />
       </yAxis>
     </LineChart>
   </center>

@@ -40,4 +40,14 @@ public class TestStableTicksAxis {
 
 		assertEquals( 0.5 * 10000, StableTicksAxis.calculateTickSpacing( 2.5 * 10000, 5 ), 0.0001 );
 	}
+
+	@Test
+	public void testCalculateTickSpacingHuge() {
+		assertEquals( 5e10, StableTicksAxis.calculateTickSpacing( 23e10, 5 ), 0.0001e10 );
+	}
+
+	@Test
+	public void testCalculateTickSpacingTiny() {
+		assertEquals( 5e-10, StableTicksAxis.calculateTickSpacing( 23e-10, 5 ), 0.001e-10 );
+	}
 }
