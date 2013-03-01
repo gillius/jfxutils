@@ -16,6 +16,8 @@
 
 package org.gillius.jfxutils;
 
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Dimension2D;
 import javafx.scene.chart.ValueAxis;
 
@@ -31,10 +33,20 @@ import java.util.List;
  */
 public class StableTicksAxis extends ValueAxis<Number> {
 
+	/**
+	 * Possible tick spacing at the 10^1 level. These numbers must be &gt;= 1 and &lt; 10.
+	 */
+	private static final double[] dividers = new double[] { 1.0, 2.5, 5.0 };
+
 	private final NumberFormat normalFormat = NumberFormat.getNumberInstance();
 	private final NumberFormat engFormat = NumberFormat.getNumberInstance();
 
 	private NumberFormat currFormat = normalFormat;
+
+	/**
+	 * Amount of padding to add on the each end of the axis when auto ranging.
+	 */
+	private DoubleProperty autoRangePadding = new SimpleDoubleProperty( 0.1 );
 
 	public StableTicksAxis() {
 	}
@@ -43,28 +55,65 @@ public class StableTicksAxis extends ValueAxis<Number> {
 		super( lowerBound, upperBound );
 	}
 
+	/**
+	 * Amount of padding to add on the each end of the axis when auto ranging.
+	 */
+	public double getAutoRangePadding() {
+		return autoRangePadding.get();
+	}
+
+	/**
+	 * Amount of padding to add on the each end of the axis when auto ranging.
+	 */
+	public DoubleProperty autoRangePaddingProperty() {
+		return autoRangePadding;
+	}
+
+	/**
+	 * Amount of padding to add on the each end of the axis when auto ranging.
+	 */
+	public void setAutoRangePadding( double autoRangePadding ) {
+		this.autoRangePadding.set( autoRangePadding );
+	}
+
 	@Override
 	protected Object autoRange( double minValue, double maxValue, double length, double labelSize ) {
 //		System.out.printf( "autoRange(%f, %f, %f, %f)",
 //		                   minValue, maxValue, length, labelSize );
-		Range ret;
+		double delta = maxValue - minValue;
 		//noinspection FloatingPointEquality
 		if ( minValue == maxValue ) {
+			//Normally this is the case for all points with the same value
 			minValue = minValue - 1;
 			maxValue = maxValue + 1;
+			delta = maxValue - minValue; //recompute
+
+		} else {
+			double paddedMin = minValue - delta * autoRangePadding.get();
+			//If we've crossed the 0 line, clamp to 0.
+			//noinspection FloatingPointEquality
+			if ( Math.signum( paddedMin ) != Math.signum( minValue ) )
+				paddedMin = 0.0;
+
+			double paddedMax = maxValue + delta * autoRangePadding.get();
+			//If we've crossed the 0 line, clamp to 0.
+			//noinspection FloatingPointEquality
+			if ( Math.signum( paddedMax ) != Math.signum( maxValue ) )
+				paddedMax = 0.0;
+
+			minValue = paddedMin;
+			maxValue = paddedMax;
 		}
 		length = getLength();
-		double delta = maxValue - minValue;
 		double scale = calculateNewScale( length, minValue, maxValue );
 
 		int maxTicks = Math.max( 1, (int) ( length / getLabelSize() ) );
 
+		Range ret;
 		ret = new Range( minValue, maxValue, calculateTickSpacing( delta, maxTicks ), scale );
 //		System.out.printf( " = %s%n", ret );
 		return ret;
 	}
-
-	private static final double[] dividers = new double[] { 1.0, 2.0, 5.0 };
 
 	public static double calculateTickSpacing( double delta, int maxTicks ) {
 		if ( delta == 0.0 )
