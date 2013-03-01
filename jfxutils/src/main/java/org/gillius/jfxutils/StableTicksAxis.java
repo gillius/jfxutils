@@ -16,7 +16,9 @@
 
 package org.gillius.jfxutils;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Dimension2D;
 import javafx.scene.chart.ValueAxis;
@@ -48,6 +50,11 @@ public class StableTicksAxis extends ValueAxis<Number> {
 	 */
 	private DoubleProperty autoRangePadding = new SimpleDoubleProperty( 0.1 );
 
+	/**
+	 * If true, when auto-ranging, force 0 to be the min or max end of the range.
+	 */
+	private BooleanProperty forceZeroInRange = new SimpleBooleanProperty( true );
+
 	public StableTicksAxis() {
 	}
 
@@ -76,19 +83,40 @@ public class StableTicksAxis extends ValueAxis<Number> {
 		this.autoRangePadding.set( autoRangePadding );
 	}
 
+	/**
+	 * If true, when auto-ranging, force 0 to be the min or max end of the range.
+	 */
+	public boolean isForceZeroInRange() {
+		return forceZeroInRange.get();
+	}
+
+	/**
+	 * If true, when auto-ranging, force 0 to be the min or max end of the range.
+	 */
+	public BooleanProperty forceZeroInRangeProperty() {
+		return forceZeroInRange;
+	}
+
+	/**
+	 * If true, when auto-ranging, force 0 to be the min or max end of the range.
+	 */
+	public void setForceZeroInRange( boolean forceZeroInRange ) {
+		this.forceZeroInRange.set( forceZeroInRange );
+	}
+
 	@Override
 	protected Object autoRange( double minValue, double maxValue, double length, double labelSize ) {
 //		System.out.printf( "autoRange(%f, %f, %f, %f)",
 //		                   minValue, maxValue, length, labelSize );
-		double delta = maxValue - minValue;
 		//noinspection FloatingPointEquality
 		if ( minValue == maxValue ) {
 			//Normally this is the case for all points with the same value
 			minValue = minValue - 1;
 			maxValue = maxValue + 1;
-			delta = maxValue - minValue; //recompute
 
 		} else {
+			//Add padding
+			double delta = maxValue - minValue;
 			double paddedMin = minValue - delta * autoRangePadding.get();
 			//If we've crossed the 0 line, clamp to 0.
 			//noinspection FloatingPointEquality
@@ -104,7 +132,20 @@ public class StableTicksAxis extends ValueAxis<Number> {
 			minValue = paddedMin;
 			maxValue = paddedMax;
 		}
+
+		//Handle forcing zero into the range
+		if ( forceZeroInRange.get() ) {
+			if ( minValue < 0 && maxValue < 0 ) {
+				maxValue = 0;
+				minValue -= -minValue * autoRangePadding.get();
+			} else if ( minValue > 0 && maxValue > 0 ) {
+				minValue = 0;
+				maxValue += maxValue * autoRangePadding.get();
+			}
+		}
+
 		length = getLength();
+		double delta = maxValue - minValue;
 		double scale = calculateNewScale( length, minValue, maxValue );
 
 		int maxTicks = Math.max( 1, (int) ( length / getLabelSize() ) );
