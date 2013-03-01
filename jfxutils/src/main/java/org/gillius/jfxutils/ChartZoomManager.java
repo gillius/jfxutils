@@ -16,6 +16,11 @@
 
 package org.gillius.jfxutils;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.event.Event;
@@ -27,6 +32,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Rectangle;
+import javafx.util.Duration;
 
 /**
  * ChartZoomManager manages a zooming selection rectangle and the bounds of the graph. It can be
@@ -90,6 +96,9 @@ public class ChartZoomManager {
 	private final SimpleDoubleProperty rectY = new SimpleDoubleProperty();
 	private final SimpleBooleanProperty selecting = new SimpleBooleanProperty( false );
 
+	private final DoubleProperty zoomDurationMillis = new SimpleDoubleProperty( 750.0 );
+	private final BooleanProperty zoomAnimated = new SimpleBooleanProperty( true );
+
 	private static enum SelectMode { Horizontal, Vertical, Both }
 
 	private SelectMode selectMode;
@@ -102,6 +111,8 @@ public class ChartZoomManager {
 	private final ValueAxis<?> xAxis;
 	private final ValueAxis<?> yAxis;
 	private final XYChartInfo chartInfo;
+
+	private final Timeline zoomAnimation = new Timeline();
 
 	/**
 	 * Construct a new ChartZoomManager. See {@link ChartZoomManager} documentation for normal usage.
@@ -149,6 +160,48 @@ public class ChartZoomManager {
 				onMouseReleased();
 			}
 		} );
+	}
+
+	/**
+	 * If true, animates the zoom.
+	 */
+	public boolean isZoomAnimated() {
+		return zoomAnimated.get();
+	}
+
+	/**
+	 * If true, animates the zoom.
+	 */
+	public BooleanProperty zoomAnimatedProperty() {
+		return zoomAnimated;
+	}
+
+	/**
+	 * If true, animates the zoom.
+	 */
+	public void setZoomAnimated( boolean zoomAnimated ) {
+		this.zoomAnimated.set( zoomAnimated );
+	}
+
+	/**
+	 * Returns the number of milliseconds the zoom animation takes.
+	 */
+	public double getZoomDurationMillis() {
+		return zoomDurationMillis.get();
+	}
+
+	/**
+	 * Returns the number of milliseconds the zoom animation takes.
+	 */
+	public DoubleProperty zoomDurationMillisProperty() {
+		return zoomDurationMillisProperty();
+	}
+
+	/**
+	 * Returns the number of milliseconds the zoom animation takes.
+	 */
+	public void setZoomDurationMillis( double zoomDurationMillis ) {
+		this.zoomDurationMillis.set( zoomDurationMillis );
 	}
 
 	/**
@@ -280,11 +333,31 @@ public class ChartZoomManager {
 		);
 
 		xAxis.setAutoRanging( false );
-		xAxis.setLowerBound( zoomWindow.getMinX() );
-		xAxis.setUpperBound( zoomWindow.getMaxX() );
 		yAxis.setAutoRanging( false );
-		yAxis.setLowerBound( zoomWindow.getMinY() );
-		yAxis.setUpperBound( zoomWindow.getMaxY() );
+		if ( zoomAnimated.get() ) {
+			zoomAnimation.stop();
+			zoomAnimation.getKeyFrames().setAll(
+					new KeyFrame( Duration.ZERO,
+					              new KeyValue( xAxis.lowerBoundProperty(), xAxis.getLowerBound() ),
+					              new KeyValue( xAxis.upperBoundProperty(), xAxis.getUpperBound() ),
+					              new KeyValue( yAxis.lowerBoundProperty(), yAxis.getLowerBound() ),
+					              new KeyValue( yAxis.upperBoundProperty(), yAxis.getUpperBound() )
+					),
+			    new KeyFrame( Duration.millis( zoomDurationMillis.get() ),
+			                  new KeyValue( xAxis.lowerBoundProperty(), zoomWindow.getMinX() ),
+			                  new KeyValue( xAxis.upperBoundProperty(), zoomWindow.getMaxX() ),
+			                  new KeyValue( yAxis.lowerBoundProperty(), zoomWindow.getMinY() ),
+			                  new KeyValue( yAxis.upperBoundProperty(), zoomWindow.getMaxY() )
+			    )
+			);
+			zoomAnimation.play();
+		} else {
+			zoomAnimation.stop();
+			xAxis.setLowerBound( zoomWindow.getMinX() );
+			xAxis.setUpperBound( zoomWindow.getMaxX() );
+			yAxis.setLowerBound( zoomWindow.getMinY() );
+			yAxis.setUpperBound( zoomWindow.getMaxY() );
+		}
 
 		selecting.set( false );
 	}
