@@ -16,12 +16,18 @@
 
 package org.gillius.jfxutils;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.value.WritableValue;
+import javafx.collections.ObservableList;
 import javafx.geometry.Dimension2D;
 import javafx.scene.chart.ValueAxis;
+import javafx.util.Duration;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -39,6 +45,19 @@ public class StableTicksAxis extends ValueAxis<Number> {
 	 * Possible tick spacing at the 10^1 level. These numbers must be &gt;= 1 and &lt; 10.
 	 */
 	private static final double[] dividers = new double[] { 1.0, 2.5, 5.0 };
+
+	private final Timeline animationTimeline = new Timeline();
+	private final WritableValue<Double> scaleValue = new WritableValue<Double>() {
+		@Override
+		public Double getValue() {
+			return getScale();
+		}
+
+		@Override
+		public void setValue( Double value ) {
+			setScale( value );
+		}
+	};
 
 	private final NumberFormat normalFormat = NumberFormat.getNumberInstance();
 	private final NumberFormat engFormat = NumberFormat.getNumberInstance();
@@ -217,10 +236,24 @@ public class StableTicksAxis extends ValueAxis<Number> {
 		Range rangeVal = (Range) range;
 //		System.out.format( "StableTicksAxis.setRange (%s, %s)%n",
 //		                   range, animate );
+		if ( animate ) {
+			animationTimeline.stop();
+			ObservableList<KeyFrame> keyFrames = animationTimeline.getKeyFrames();
+			keyFrames.setAll(
+					new KeyFrame( Duration.ZERO,
+					              new KeyValue( currentLowerBound, getLowerBound() ),
+					              new KeyValue( scaleValue, getScale() ) ),
+					new KeyFrame( Duration.millis( 750 ),
+					              new KeyValue( currentLowerBound, rangeVal.low ),
+					              new KeyValue( scaleValue, rangeVal.scale ) ) );
+			animationTimeline.play();
+
+		} else {
+			currentLowerBound.set( rangeVal.low );
+			setScale( rangeVal.scale );
+		}
 		setLowerBound( rangeVal.low );
 		setUpperBound( rangeVal.high );
-		currentLowerBound.set( rangeVal.low );
-		setScale( rangeVal.scale );
 
 		//Set the number format. Pick a "normal" format unless the numbers are quite large or small.
 		currFormat = normalFormat;
