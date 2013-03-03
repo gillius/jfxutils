@@ -5,10 +5,18 @@ JavaFX Utilities - Zoom and Pan Charts and Pane Scaling
 
 License: Apache 2
 
+Latest Release: 0.1
+Development version: 0.2-SNAPSHOT
+
 * Add zooming functionality to a JavaFX XYChart:
   * Drag mouse in plot area to zoom both axes
   * Drag mouse on X axis to zoom that axis only
   * Drag moues on Y axis to zoom that axis only
+  * (New in 0.2) Mouse filter, for example allow only left click drag to zoom.
+  * (New in 0.2) Animated zooming
+* (New in 0.2) Panning ability for XYCharts
+  * Mouse filtering, for example right click drag or ctrl+left click for panning
+* (New in 0.2) StableTicksAxis provides the same tick locations for a zoom level, regardless of the lower and upper bounds. This provides a much smoother experience when panning and zooming.
 * Ability to create a Pane that scales when it resizes instead of reflowing its layout, creating an effect like a presentation slide.
 * An experimental way to replace a Node in the scene graph with a different one (it's not as easy as you think)
 * A way to get X and Y offsets of a Node from an arbitrary ancestor in a way that handles translation/padding/layout, etc., but does not yet handle scale and rotations (this might be possible if transforms can be combined as rumored for JFX 8)
@@ -39,7 +47,7 @@ Future Work
 -----------
 
 * Panning ability on graphs
-* Default widget panel with buttons to switch between zooming and panning and reset graph's zoom to default
+* (Maybe) Default widget panel with buttons to switch between zooming and panning and reset graph's zoom to default
 
 Building
 --------
