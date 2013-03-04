@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.gillius.jfxutils;
+package org.gillius.jfxutils.chart;
 
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;

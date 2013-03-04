@@ -26,7 +26,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
@@ -36,8 +35,9 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import org.gillius.jfxutils.ChartPanManager;
 import org.gillius.jfxutils.JFXUtil;
+import org.gillius.jfxutils.chart.ChartPanManager;
+import org.gillius.jfxutils.chart.JFXChartUtil;
 
 public class Charting extends Application {
 	public static void main( String[] args ) {
@@ -117,10 +117,6 @@ public class Charting extends Application {
 		series.setName( "Data" );
 
 		chart.getData().add( series );
-		if ( chart.getXAxis() instanceof NumberAxis ) {
-			NumberAxis xAxis = (NumberAxis) chart.getXAxis();
-			xAxis.setForceZeroInRange( false );
-		}
 
 		addDataTimeline = new Timeline( new KeyFrame(
 				Duration.millis( 250 ),
@@ -165,11 +161,11 @@ public class Charting extends Application {
 		panner.start();
 
 		//Zooming works only via primary mouse button without ctrl held down
-		JFXUtil.setupZooming( chart, new EventHandler<MouseEvent>() {
+		JFXChartUtil.setupZooming( chart, new EventHandler<MouseEvent>() {
 			@Override
 			public void handle( MouseEvent mouseEvent ) {
 				if ( mouseEvent.getButton() != MouseButton.PRIMARY ||
-						 mouseEvent.isShortcutDown() )
+				     mouseEvent.isShortcutDown() )
 					mouseEvent.consume();
 			}
 		} );

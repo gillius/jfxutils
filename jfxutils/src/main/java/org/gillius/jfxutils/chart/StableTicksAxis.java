@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.gillius.jfxutils;
+package org.gillius.jfxutils.chart;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -189,7 +189,7 @@ public class StableTicksAxis extends ValueAxis<Number> {
 		//The factor will be close to the log10, this just optimizes the search
 		int factor = (int) Math.log10( delta );
 		int divider = 0;
-		int numTicks = (int) (delta / ( dividers[divider] * Math.pow( 10, factor ) ));
+		double numTicks = delta / ( dividers[divider] * Math.pow( 10, factor ) );
 
 		//We don't have enough ticks, so increase ticks until we're over the limit, then back off once.
 		if ( numTicks < maxTicks ) {
@@ -201,10 +201,11 @@ public class StableTicksAxis extends ValueAxis<Number> {
 					divider = dividers.length - 1;
 				}
 
-				numTicks = (int) (delta / ( dividers[divider] * Math.pow( 10, factor ) ));
+				numTicks = delta / ( dividers[divider] * Math.pow( 10, factor ) );
 			}
 
 			//Now back off once unless we hit exactly
+			//noinspection FloatingPointEquality
 			if ( numTicks != maxTicks ) {
 				++divider;
 				if ( divider >= dividers.length ) {
@@ -221,7 +222,7 @@ public class StableTicksAxis extends ValueAxis<Number> {
 					divider = 0;
 				}
 
-				numTicks = (int) (delta / ( dividers[divider] * Math.pow( 10, factor ) ));
+				numTicks = delta / ( dividers[divider] * Math.pow( 10, factor ) );
 			}
 		}
 

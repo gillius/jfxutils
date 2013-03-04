@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.gillius.jfxutils;
+package org.gillius.jfxutils.chart;
 
 import org.junit.*;
 
@@ -29,10 +29,10 @@ public class TestStableTicksAxis {
 	@Test
 	public void testCalculateTickSpacing() {
 		assertEquals( 1.0, StableTicksAxis.calculateTickSpacing( 3.0, 5 ), 0.0001 );
-		assertEquals( 2.0, StableTicksAxis.calculateTickSpacing( 9.0, 5 ), 0.0001 );
-		assertEquals( 2.0, StableTicksAxis.calculateTickSpacing( 10.0, 5 ), 0.0001 );
-		assertEquals( 2.0, StableTicksAxis.calculateTickSpacing( 11.0, 5 ), 0.0001 );
-		assertEquals( 5.0, StableTicksAxis.calculateTickSpacing( 12.0, 5 ), 0.0001 );
+		assertEquals( 2.5, StableTicksAxis.calculateTickSpacing( 9.0, 5 ), 0.0001 );
+		assertEquals( 2.5, StableTicksAxis.calculateTickSpacing( 10.0, 5 ), 0.0001 );
+		assertEquals( 2.5, StableTicksAxis.calculateTickSpacing( 11.0, 5 ), 0.0001 );
+		assertEquals( 5.0, StableTicksAxis.calculateTickSpacing( 14.0, 5 ), 0.0001 );
 
 		assertEquals( 10.0, StableTicksAxis.calculateTickSpacing( 50.0, 5 ), 0.0001 );
 

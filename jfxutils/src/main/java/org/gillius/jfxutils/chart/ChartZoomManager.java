@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.gillius.jfxutils;
+package org.gillius.jfxutils.chart;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -33,6 +33,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
+import org.gillius.jfxutils.EventHandlerManager;
 
 /**
  * ChartZoomManager manages a zooming selection rectangle and the bounds of the graph. It can be
