@@ -31,7 +31,6 @@ import javafx.util.Duration;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -45,6 +44,8 @@ public class StableTicksAxis extends ValueAxis<Number> {
 	 * Possible tick spacing at the 10^1 level. These numbers must be &gt;= 1 and &lt; 10.
 	 */
 	private static final double[] dividers = new double[] { 1.0, 2.5, 5.0 };
+
+	private static final int numMinorTicks = 3;
 
 	private final Timeline animationTimeline = new Timeline();
 	private final WritableValue<Double> scaleValue = new WritableValue<Double>() {
@@ -63,6 +64,8 @@ public class StableTicksAxis extends ValueAxis<Number> {
 	private final NumberFormat engFormat = NumberFormat.getNumberInstance();
 
 	private NumberFormat currFormat = normalFormat;
+
+	private List<Number> minorTicks;
 
 	/**
 	 * Amount of padding to add on the each end of the axis when auto ranging.
@@ -124,7 +127,7 @@ public class StableTicksAxis extends ValueAxis<Number> {
 	}
 
 	@Override
-	protected Object autoRange( double minValue, double maxValue, double length, double labelSize ) {
+	protected Range autoRange( double minValue, double maxValue, double length, double labelSize ) {
 //		System.out.printf( "autoRange(%f, %f, %f, %f)",
 //		                   minValue, maxValue, length, labelSize );
 		//noinspection FloatingPointEquality
@@ -228,7 +231,7 @@ public class StableTicksAxis extends ValueAxis<Number> {
 	@Override
 	protected List<Number> calculateMinorTickMarks() {
 //		System.out.println( "StableTicksAxis.calculateMinorTickMarks" );
-		return Collections.emptyList();
+		return minorTicks;
 	}
 
 	@Override
@@ -269,8 +272,8 @@ public class StableTicksAxis extends ValueAxis<Number> {
 	}
 
 	@Override
-	protected Object getRange() {
-		Object ret = autoRange( getLowerBound(), getUpperBound(), getLength(), getLabelSize() );
+	protected Range getRange() {
+		Range ret = autoRange( getLowerBound(), getUpperBound(), getLength(), getLabelSize() );
 //		System.out.println( "StableTicksAxis.getRange = " + ret );
 		return ret;
 	}
@@ -283,8 +286,14 @@ public class StableTicksAxis extends ValueAxis<Number> {
 		double firstTick = Math.ceil( rangeVal.low / rangeVal.tickSpacing ) * rangeVal.tickSpacing;
 		int numTicks = (int) (rangeVal.getDelta() / rangeVal.tickSpacing);
 		List<Number> ret = new ArrayList<Number>( numTicks + 1 );
+		minorTicks = new ArrayList<Number>( ( numTicks + 1 ) * numMinorTicks );
+		double minorTickSpacing = rangeVal.tickSpacing / ( numMinorTicks + 1 );
 		for ( int i = 0; i <= numTicks; ++i ) {
-			ret.add( firstTick + rangeVal.tickSpacing * i );
+			double majorTick = firstTick + rangeVal.tickSpacing * i;
+			ret.add( majorTick );
+			for ( int j = 1; j <= numMinorTicks; ++j ) {
+				minorTicks.add( majorTick + minorTickSpacing * j );
+			}
 		}
 //		System.out.printf( " = %s%n", ret );
 		return ret;
@@ -312,10 +321,10 @@ public class StableTicksAxis extends ValueAxis<Number> {
 	}
 
 	private static class Range {
-		public double low;
-		public double high;
-		public double tickSpacing;
-		public double scale;
+		public final double low;
+		public final double high;
+		public final double tickSpacing;
+		public final double scale;
 
 		private Range( double low, double high, double tickSpacing, double scale ) {
 			this.low = low;
