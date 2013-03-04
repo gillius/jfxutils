@@ -292,10 +292,15 @@ public class StableTicksAxis extends ValueAxis<Number> {
 		Range rangeVal = (Range) range;
 //		System.out.format( "StableTicksAxis.calculateTickValues (length=%f, range=%s)",
 //		                   length, rangeVal );
-		double firstTick = Math.ceil( rangeVal.low / rangeVal.tickSpacing ) * rangeVal.tickSpacing;
-		int numTicks = (int) (rangeVal.getDelta() / rangeVal.tickSpacing);
+		//Use floor so we start generating ticks before the axis starts -- this is really only relevant
+		//because of the minor ticks before the first visible major tick. We'll generate a first
+		//invisible major tick but the ValueAxis seems to filter it out.
+		double firstTick = Math.floor( rangeVal.low / rangeVal.tickSpacing ) * rangeVal.tickSpacing;
+		//Generate one more tick than we expect, for "overlap" to get minor ticks on both sides of the
+		//first and last major tick.
+		int numTicks = (int) (rangeVal.getDelta() / rangeVal.tickSpacing) + 1;
 		List<Number> ret = new ArrayList<Number>( numTicks + 1 );
-		minorTicks = new ArrayList<Number>( ( numTicks + 1 ) * numMinorTicks );
+		minorTicks = new ArrayList<Number>( ( numTicks + 2 ) * numMinorTicks );
 		double minorTickSpacing = rangeVal.tickSpacing / ( numMinorTicks + 1 );
 		for ( int i = 0; i <= numTicks; ++i ) {
 			double majorTick = firstTick + rangeVal.tickSpacing * i;
