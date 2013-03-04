@@ -3,9 +3,8 @@ jfxutils
 
 JavaFX Utilities - Zoom and Pan Charts and Pane Scaling
 
-License: Apache 2
-
-Latest Release: 0.1
+License: Apache 2<br/>
+Latest Release: 0.1<br/>
 Development version: 0.2-SNAPSHOT
 
 * Add zooming functionality to a JavaFX XYChart:
