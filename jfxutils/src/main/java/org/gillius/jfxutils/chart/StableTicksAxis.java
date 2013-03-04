@@ -166,7 +166,13 @@ public class StableTicksAxis extends ValueAxis<Number> {
 			}
 		}
 
-		length = getLength();
+		Range ret = getRange( minValue, maxValue );
+//		System.out.printf( " = %s%n", ret );
+		return ret;
+	}
+
+	private Range getRange( double minValue, double maxValue ) {
+		double length = getLength();
 		double delta = maxValue - minValue;
 		double scale = calculateNewScale( length, minValue, maxValue );
 
@@ -174,7 +180,6 @@ public class StableTicksAxis extends ValueAxis<Number> {
 
 		Range ret;
 		ret = new Range( minValue, maxValue, calculateTickSpacing( delta, maxTicks ), scale );
-//		System.out.printf( " = %s%n", ret );
 		return ret;
 	}
 
@@ -226,6 +231,9 @@ public class StableTicksAxis extends ValueAxis<Number> {
 			}
 		}
 
+//		System.out.printf( "calculateTickSpacing( %f, %d ) = %f%n",
+//		                   delta, maxTicks, dividers[divider] * Math.pow( 10, factor ) );
+
 		return dividers[divider] * Math.pow( 10, factor );
 	}
 
@@ -274,7 +282,7 @@ public class StableTicksAxis extends ValueAxis<Number> {
 
 	@Override
 	protected Range getRange() {
-		Range ret = autoRange( getLowerBound(), getUpperBound(), getLength(), getLabelSize() );
+		Range ret = getRange( getLowerBound(), getUpperBound() );
 //		System.out.println( "StableTicksAxis.getRange = " + ret );
 		return ret;
 	}
