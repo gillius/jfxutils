@@ -42,10 +42,20 @@ Maven - Latest Development Version
 
 javadoc and sources variants are also available.
 
+Screenshot
+----------
+
+Here is a screenshot showing the example application in the jfxutils-example artifact. The first image shows the example using the new StableTicksAxis, which has better performance than the JavaFX NumberAxis when zooming and panning as the tick marks are fixed relative to the data values:
+
+![JFXUtils charting example using StableTicksAxis](https://raw.github.com/gillius/jfxutils/master/web/screenshots/StableTicksAxisGraph.png)
+
+Here is the charting application using the NumberAxis after zooming and panning, showing the awkward tick labels that result, as NumberAxis tick labels are fixed with the graph's graphical layout and not fixed relative to the data:
+
+![JFXUtils charting example using StableTicksAxis](https://raw.github.com/gillius/jfxutils/master/web/screenshots/NumberAxisGraph.png)
+
 Future Work
 -----------
 
-* Panning ability on graphs
 * (Maybe) Default widget panel with buttons to switch between zooming and panning and reset graph's zoom to default
 
 Building
