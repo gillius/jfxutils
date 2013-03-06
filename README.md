@@ -11,8 +11,9 @@ Development version: 0.3-SNAPSHOT
   * Drag mouse in plot area to zoom both axes
   * Drag mouse on X axis to zoom that axis only
   * Drag moues on Y axis to zoom that axis only
-  * (New in 0.2) Mouse filter, for example allow only left click drag to zoom.
+  * (New in 0.2) Mouse filter, for example allow only left click drag to zoom
   * (New in 0.2) Animated zooming
+  * (New in 0.3) Mouse wheel zoom in plot area, X axis, or Y axis. This has NOT been tested with mice with "continuous" wheels, only ones that rotate in discrete steps/clicks.
 * (New in 0.2) Panning ability for XYCharts
   * Mouse filtering, for example right click drag or ctrl+left click for panning
 * (New in 0.2) StableTicksAxis provides the same tick locations for a zoom level, regardless of the lower and upper bounds. This provides a much smoother experience when panning and zooming.
