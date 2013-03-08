@@ -20,6 +20,8 @@ import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -69,6 +71,13 @@ public class Charting extends Application {
 	void autoZoom() {
 		chart.getXAxis().setAutoRanging( true );
 		chart.getYAxis().setAutoRanging( true );
+		//There seems to be some bug, even with the default NumberAxis, that simply setting the
+		//auto ranging does not recompute the ranges. So we clear all chart data then re-add it.
+		//Hopefully I find a more proper way for this, unless it's really bug, in which case I hope
+		//it gets fixed.
+		ObservableList<XYChart.Series<Number,Number>> data = chart.getData();
+		chart.setData( FXCollections.<XYChart.Series<Number, Number>>emptyObservableList() );
+		chart.setData( data );
 	}
 
 	@FXML
