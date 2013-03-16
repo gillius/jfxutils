@@ -43,6 +43,12 @@ Maven - Latest Development Version
 
 javadoc and sources variants are also available.
 
+Documentation
+-------------
+
+Documentation for latest release: http://gillius.org/jfxutils/docs/latest/
+Documentation for 0.3: http://gillius.org/jfxutils/docs/0.3/
+
 Screenshot
 ----------
 
