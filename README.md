@@ -13,10 +13,11 @@ Development version: 0.4-SNAPSHOT
   * Drag moues on Y axis to zoom that axis only
   * (0.2) Mouse filter, for example allow only left click drag to zoom
   * (0.2) Animated zooming
-  * (New in 0.3) Mouse wheel zoom in plot area, X axis, or Y axis. This has NOT been tested with mice with "continuous" wheels, only ones that rotate in discrete steps/clicks.
+  * (0.3) Mouse wheel zoom in plot area, X axis, or Y axis. This has NOT been tested with mice with "continuous" wheels, only ones that rotate in discrete steps/clicks.
 * (0.2) Panning ability for XYCharts
   * Mouse filtering, for example right click drag or ctrl+left click for panning
 * (0.2) StableTicksAxis provides the same tick locations for a zoom level, regardless of the lower and upper bounds. This provides a much smoother experience when panning and zooming.
+  * (0.4) Ability to customize axis label formatting of StableTicksAxis
 * Ability to create a Pane that scales when it resizes instead of reflowing its layout, creating an effect like a presentation slide.
 * An experimental way to replace a Node in the scene graph with a different one (it's not as easy as you think)
 * A way to get X and Y offsets of a Node from an arbitrary ancestor in a way that handles translation/padding/layout, etc., but does not yet handle scale and rotations (this might be possible if transforms can be combined as rumored for JFX 8)

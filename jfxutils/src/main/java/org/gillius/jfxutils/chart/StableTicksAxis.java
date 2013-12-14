@@ -29,12 +29,11 @@ import javafx.geometry.Dimension2D;
 import javafx.scene.chart.ValueAxis;
 import javafx.util.Duration;
 
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * StableTicksAxis is not ready to be used.
+ * The StableTicksAxis places tick marks at consistent (axis value rather than graphical) locations.
  *
  * @author Jason Winnebeck
  */
@@ -60,10 +59,7 @@ public class StableTicksAxis extends ValueAxis<Number> {
 		}
 	};
 
-	private final NumberFormat normalFormat = NumberFormat.getNumberInstance();
-	private final NumberFormat engFormat = NumberFormat.getNumberInstance();
-
-	private NumberFormat currFormat = normalFormat;
+	private AxisTickFormatter axisTickFormatter = new DefaultAxisTickFormatter();
 
 	private List<Number> minorTicks;
 
@@ -82,6 +78,14 @@ public class StableTicksAxis extends ValueAxis<Number> {
 
 	public StableTicksAxis( double lowerBound, double upperBound ) {
 		super( lowerBound, upperBound );
+	}
+
+	public AxisTickFormatter getAxisTickFormatter() {
+		return axisTickFormatter;
+	}
+
+	public void setAxisTickFormatter( AxisTickFormatter axisTickFormatter ) {
+		this.axisTickFormatter = axisTickFormatter;
 	}
 
 	/**
@@ -267,17 +271,7 @@ public class StableTicksAxis extends ValueAxis<Number> {
 		setLowerBound( rangeVal.low );
 		setUpperBound( rangeVal.high );
 
-		//Set the number format. Pick a "normal" format unless the numbers are quite large or small.
-		currFormat = normalFormat;
-		double log10 = Math.log10( rangeVal.low );
-		if ( log10 < -4.0 || log10 > 5.0 ) {
-			currFormat = engFormat;
-		} else {
-			log10 = Math.log10( rangeVal.high );
-			if ( log10 < -4.0 || log10 > 5.0 ) {
-				currFormat = engFormat;
-			}
-		}
+		axisTickFormatter.setRange( rangeVal.low, rangeVal.high, rangeVal.tickSpacing );
 	}
 
 	@Override
@@ -315,7 +309,7 @@ public class StableTicksAxis extends ValueAxis<Number> {
 
 	@Override
 	protected String getTickMarkLabel( Number number ) {
-		return currFormat.format( number );
+		return axisTickFormatter.format( number );
 	}
 
 	private double getLength() {

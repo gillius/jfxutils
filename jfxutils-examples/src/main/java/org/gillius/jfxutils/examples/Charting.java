@@ -39,7 +39,12 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.gillius.jfxutils.JFXUtil;
 import org.gillius.jfxutils.chart.ChartPanManager;
+import org.gillius.jfxutils.chart.FixedFormatTickFormatter;
 import org.gillius.jfxutils.chart.JFXChartUtil;
+import org.gillius.jfxutils.chart.StableTicksAxis;
+
+import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 
 public class Charting extends Application {
 	public static void main( String[] args ) {
@@ -121,6 +126,12 @@ public class Charting extends Application {
 	@FXML
 	void initialize() {
 		startTime = System.currentTimeMillis();
+
+		//Set chart to format dates on the X axis
+		SimpleDateFormat format = new SimpleDateFormat( "HH:mm:ss" );
+		format.setTimeZone( TimeZone.getTimeZone( "GMT" ) );
+		((StableTicksAxis) chart.getXAxis()).setAxisTickFormatter(
+				new FixedFormatTickFormatter( format ) );
 
 		series = new XYChart.Series<Number, Number>();
 		series.setName( "Data" );
