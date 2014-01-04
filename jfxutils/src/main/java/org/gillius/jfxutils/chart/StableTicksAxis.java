@@ -135,7 +135,8 @@ public class StableTicksAxis extends ValueAxis<Number> {
 //		System.out.printf( "autoRange(%f, %f, %f, %f)",
 //		                   minValue, maxValue, length, labelSize );
 		//noinspection FloatingPointEquality
-		if ( minValue == maxValue ) {
+//		if ( minValue == maxValue ) {
+                if ( Math.abs(minValue - maxValue) < 1e-300) {
 			//Normally this is the case for all points with the same value
 			minValue = minValue - 1;
 			maxValue = maxValue + 1;
