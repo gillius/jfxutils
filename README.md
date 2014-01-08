@@ -30,7 +30,7 @@ Bug Fixes in 0.4
 Getting
 -------
 
-Maven - Latest Development Version
+Maven - Latest Release
 ```xml
 <repositories>
   <repository>
@@ -47,7 +47,7 @@ Maven - Latest Development Version
 </dependency>
 ```
 
-javadoc and sources variants are also available.
+javadoc and sources variants are also available. The development verison is 0.4-SNAPSHOT, if you want that version, replace the 0.3 with 0.4-SNAPSHOT. If you need an official 0.4 release, just ask and I'll do it.
 
 Documentation
 -------------
