@@ -22,6 +22,11 @@ Development version: 0.4-SNAPSHOT
 * An experimental way to replace a Node in the scene graph with a different one (it's not as easy as you think)
 * A way to get X and Y offsets of a Node from an arbitrary ancestor in a way that handles translation/padding/layout, etc., but does not yet handle scale and rotations (this might be possible if transforms can be combined as rumored for JFX 8)
 
+Bug Fixes in 0.4
+----------------
+
+* By Daniel Weil: if the data range is very small, StableTicksAxis does not work well. So, if the range is less than 1e-300, range the axis as if min==max (which will show a straight line).
+
 Getting
 -------
 

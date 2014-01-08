@@ -134,9 +134,9 @@ public class StableTicksAxis extends ValueAxis<Number> {
 	protected Range autoRange( double minValue, double maxValue, double length, double labelSize ) {
 //		System.out.printf( "autoRange(%f, %f, %f, %f)",
 //		                   minValue, maxValue, length, labelSize );
-		//noinspection FloatingPointEquality
-//		if ( minValue == maxValue ) {
-                if ( Math.abs(minValue - maxValue) < 1e-300) {
+		//By dweil: if the range is very small, display it like a flat line, the scaling doesn't work very well at these
+		//values. 1e-300 was chosen arbitrarily.
+		if ( Math.abs(minValue - maxValue) < 1e-300) {
 			//Normally this is the case for all points with the same value
 			minValue = minValue - 1;
 			maxValue = maxValue + 1;
