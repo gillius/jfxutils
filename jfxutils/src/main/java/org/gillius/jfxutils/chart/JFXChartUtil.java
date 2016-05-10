@@ -48,14 +48,14 @@ public class JFXChartUtil {
 	 * {@link ChartZoomManager}. Wraps the chart in the components required to implement zooming. The
 	 * current implementation wraps the chart in a StackPane, which has the chart and a blue
 	 * translucent rectangle as children. Returns the top level of the created components.
-	 * <p/>
+	 * <p>
 	 * If the chart already has a parent, that parent must be a {@link Pane}, and the chart is
 	 * replaced with the wrapping region, and the return value could be ignored. If the chart does
 	 * not have a parent, the same wrapping node is returned, which will need to be added to some
 	 * parent.
-	 * <p/>
+	 * <p>
 	 * The chart's axes must both be a type of ValueAxis.
-	 * <p/>
+	 * <p>
 	 * The wrapping logic does not seem to be perfect, in fact there is a special case to handle
 	 * {@link BorderPane}s. If it's not found to be reliable, then create the wrapping components
 	 * yourself (such as in the FXML), or setup zooming before adding it to a parent.
