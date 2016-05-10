@@ -9,6 +9,7 @@ Development version: 0.4-SNAPSHOT
 
 * Add zooming functionality to a JavaFX XYChart:
   * Drag mouse in plot area to zoom both axes
+    * (0.4) #4 constrain panning to horizontal or vertical axis
   * Drag mouse on X axis to zoom that axis only
   * Drag moues on Y axis to zoom that axis only
   * (0.2) Mouse filter, for example allow only left click drag to zoom
