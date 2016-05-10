@@ -136,12 +136,14 @@ public class ChartPanManager {
 		yAxis.setAnimated( false );
 		yAxis.setAutoRanging( false );
 
-		if ( chartInfo.getPlotArea().contains( lastX, lastY ) ) {
-			panMode = PanMode.Both;
-		} else if ( chartInfo.getXAxisArea().contains( lastX, lastY ) ) {
+		if ( chartInfo.getXAxisArea().contains( lastX, lastY ) ) {
 			panMode = PanMode.Horizontal;
 		} else if ( chartInfo.getYAxisArea().contains( lastX, lastY ) ) {
 			panMode = PanMode.Vertical;
+		} else {
+			// probably chartInfo.getPlotArea().contains( lastX, lastY ), 
+			// but not necessarily, e.g. in the corners/title/etc.
+			panMode = PanMode.Both;	
 		}
 
 		dragging = true;
