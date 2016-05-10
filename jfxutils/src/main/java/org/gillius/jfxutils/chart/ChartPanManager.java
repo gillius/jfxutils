@@ -21,6 +21,7 @@ import javafx.event.EventHandler;
 import javafx.scene.chart.ValueAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
 import org.gillius.jfxutils.EventHandlerManager;
 
 /**
@@ -40,6 +41,11 @@ public class ChartPanManager {
 
 	private final ValueAxis<?> xAxis;
 	private final ValueAxis<?> yAxis;
+	private final XYChartInfo chartInfo;
+
+	private enum PanMode { Horizontal, Vertical, Both }
+
+	private PanMode panMode;
 
 	private EventHandler<? super MouseEvent> mouseFilter = DEFAULT_FILTER;
 
@@ -51,10 +57,11 @@ public class ChartPanManager {
 	private double lastX;
 	private double lastY;
 
-	public ChartPanManager( XYChart<?, ?> chart ) {
+	public ChartPanManager(XYChart<?, ?> chart ) {
 		handlerManager = new EventHandlerManager( chart );
 		xAxis = (ValueAxis<?>) chart.getXAxis();
 		yAxis = (ValueAxis<?>) chart.getYAxis();
+		chartInfo = new XYChartInfo( chart, chart );
 
 		handlerManager.addEventHandler( false, MouseEvent.DRAG_DETECTED, new EventHandler<MouseEvent>() {
 			@Override
@@ -129,6 +136,14 @@ public class ChartPanManager {
 		yAxis.setAnimated( false );
 		yAxis.setAutoRanging( false );
 
+		if ( chartInfo.getPlotArea().contains( lastX, lastY ) ) {
+			panMode = PanMode.Both;
+		} else if ( chartInfo.getXAxisArea().contains( lastX, lastY ) ) {
+			panMode = PanMode.Horizontal;
+		} else if ( chartInfo.getYAxisArea().contains( lastX, lastY ) ) {
+			panMode = PanMode.Vertical;
+		}
+
 		dragging = true;
 	}
 
@@ -136,18 +151,21 @@ public class ChartPanManager {
 		if ( !dragging )
 			return;
 
-		double dX = ( event.getX() - lastX ) / -xAxis.getScale();
-		double dY = ( event.getY() - lastY ) / -yAxis.getScale();
-		lastX = event.getX();
-		lastY = event.getY();
+		if ( panMode == PanMode.Both || panMode == PanMode.Horizontal ) {
+			double dX = ( event.getX() - lastX ) / -xAxis.getScale();
+			lastX = event.getX();
+			xAxis.setAutoRanging( false );
+			xAxis.setLowerBound( xAxis.getLowerBound() + dX );
+			xAxis.setUpperBound( xAxis.getUpperBound() + dX );
+		}
 
-		xAxis.setAutoRanging( false );
-		xAxis.setLowerBound( xAxis.getLowerBound() + dX );
-		xAxis.setUpperBound( xAxis.getUpperBound() + dX );
-
-		yAxis.setAutoRanging( false );
-		yAxis.setLowerBound( yAxis.getLowerBound() + dY );
-		yAxis.setUpperBound( yAxis.getUpperBound() + dY );
+		if ( panMode == PanMode.Both || panMode == PanMode.Vertical ) {
+			double dY = ( event.getY() - lastY ) / -yAxis.getScale();
+			lastY = event.getY();
+			yAxis.setAutoRanging( false );
+			yAxis.setLowerBound( yAxis.getLowerBound() + dY );
+			yAxis.setUpperBound( yAxis.getUpperBound() + dY );
+		}
 	}
 
 	private void release() {
