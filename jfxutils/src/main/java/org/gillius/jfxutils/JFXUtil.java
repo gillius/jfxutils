@@ -73,14 +73,14 @@ public class JFXUtil {
 	/**
 	 * Make a best attempt to replace the original component with the replacement, and keep the same
 	 * position and layout constraints in the container.
-	 * <p/>
+	 * <p>
 	 * Currently this method is probably not perfect. It uses three strategies:
 	 * <ol>
 	 *   <li>If the original has any properties, move all of them to the replacement</li>
 	 *   <li>If the parent of the original is a {@link BorderPane}, preserve the position</li>
 	 *   <li>Preserve the order of the children in the parent's list</li>
 	 * </ol>
-	 * <p/>
+	 * <p>
 	 * This method does not transfer any handlers (mouse handlers for example).
 	 *
 	 * @param original    non-null Node whose parent is a {@link Pane}.
@@ -126,10 +126,10 @@ public class JFXUtil {
 	 * Creates a "Scale Pane", which is a pane that scales as it resizes, instead of reflowing layout
 	 * like a normal pane. It can be used to create an effect like a presentation slide. There is no
 	 * attempt to preserve the aspect ratio.
-	 * <p/>
+	 * <p>
 	 * If the region has an explicitly set preferred width and height, those are used unless
 	 * override is set true.
-	 * <p/>
+	 * <p>
 	 * If the region already has a parent, the returned pane will replace it via the
 	 * {@link #replaceComponent(Node, Node)} method. The Region's parent must be a Pane in this case.
 	 *

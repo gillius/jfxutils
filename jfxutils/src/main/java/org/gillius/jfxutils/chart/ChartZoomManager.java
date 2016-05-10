@@ -44,9 +44,9 @@ import org.gillius.jfxutils.EventHandlerManager;
  * StackPane with two children, an XYChart type and a Rectangle. The Rectangle should start out
  * invisible and have mouseTransparent set to true. If it has a stroke, it should be of INSIDE
  * type to be pixel perfect.
- * <p/>
+ * <p>
  * You can also use {@link JFXChartUtil#setupZooming(XYChart)} for a default solution.
- * <p/>
+ * <p>
  * Six types of zooming are supported. All are enabled by default. The drag zooming can be disabled
  * with the {@link #setMouseFilter} set to a mouse filter that allows nothing. Mouse wheel zooming
  * can be disabled via the {@link #setMouseWheelZoomAllowed} method.
@@ -59,12 +59,12 @@ import org.gillius.jfxutils.EventHandlerManager;
  *   <li>X-axis only zooming by mouse wheel; cursor used as focus point</li>
  *   <li>Y-axis only zooming by mouse wheel; cursor used as focus point</li>
  * </ol>
- * <p/>
+ * <p>
  * A lot of code in ChartZoomManager currently assumes there are no scale or rotate
  * transforms between the chartPane and the axes and plot area. However, all translation transforms,
  * layoutX/Y changes, padding, margin, and setTranslate issues should be OK. This might be improved
  * later, for example JavaFX 8 is rumored to allow transform multiplication, which could solve this.
- * <p/>
+ * <p>
  * Example FXML to create the components used by this class:
  * <pre>
 &lt;StackPane fx:id="chartPane" alignment="CENTER"&gt;

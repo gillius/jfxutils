@@ -29,7 +29,7 @@ import static org.gillius.jfxutils.JFXUtil.*;
  * XYChartInfo provides information about areas in an {@link XYChart}. Most of the methods deal with
  * locating components of the chart in the coordinate space of the reference node. The reference
  * node could be the chart itself or an ancestor of the chart.
- * <p/>
+ * <p>
  * There is a current limitation of this class in that there must not be scaling or rotation
  * transformations between the reference node and the chart's axes. Therefore, the reference node
  * is best when it is the chart itself or an immediate parent of the chart.
