@@ -110,9 +110,9 @@ public class ChartZoomManager {
 	private final BooleanProperty zoomAnimated = new SimpleBooleanProperty( true );
 	private final BooleanProperty mouseWheelZoomAllowed = new SimpleBooleanProperty( true );
 
-	private static enum ZoomMode { Horizontal, Vertical, Both }
-
-	private ZoomMode zoomMode;
+	private AxisConstraint zoomMode = AxisConstraint.None;
+	private AxisConstraintStrategy axisConstraintStrategy = AxisConstraintStrategies.getIgnoreOutsideChart();
+	private AxisConstraintStrategy mouseWheelAxisConstraintStrategy = AxisConstraintStrategies.getDefault();
 
 	private EventHandler<? super MouseEvent> mouseFilter = DEFAULT_FILTER;
 
@@ -173,6 +173,44 @@ public class ChartZoomManager {
 		} );
 
 		handlerManager.addEventHandler( false, ScrollEvent.ANY, new MouseWheelZoomHandler() );
+	}
+
+	/**
+	 * Returns the current strategy in use for mouse drag events.
+	 *
+	 * @see #setAxisConstraintStrategy(AxisConstraintStrategy)
+	 */
+	public AxisConstraintStrategy getAxisConstraintStrategy() {
+		return axisConstraintStrategy;
+	}
+
+	/**
+	 * Sets the {@link AxisConstraintStrategy} to use for mouse drag events, which determines which axis is allowed for
+	 * zooming. The default implementation is {@link AxisConstraintStrategies#getIgnoreOutsideChart()}.
+	 *
+	 * @see AxisConstraintStrategies
+	 */
+	public void setAxisConstraintStrategy( AxisConstraintStrategy axisConstraintStrategy ) {
+		this.axisConstraintStrategy = axisConstraintStrategy;
+	}
+
+	/**
+	 * Returns the current strategy in use for mouse wheel events.
+	 *
+	 * @see #setMouseWheelAxisConstraintStrategy(AxisConstraintStrategy)
+	 */
+	public AxisConstraintStrategy getMouseWheelAxisConstraintStrategy() {
+		return mouseWheelAxisConstraintStrategy;
+	}
+
+	/**
+	 * Sets the {@link AxisConstraintStrategy} to use for mouse wheel events, which determines which axis is allowed for
+	 * zooming. The default implementation is {@link AxisConstraintStrategies#getDefault()}.
+	 *
+	 * @see AxisConstraintStrategies
+	 */
+	public void setMouseWheelAxisConstraintStrategy( AxisConstraintStrategy mouseWheelAxisConstraintStrategy ) {
+		this.mouseWheelAxisConstraintStrategy = mouseWheelAxisConstraintStrategy;
 	}
 
 	/**
@@ -295,34 +333,36 @@ public class ChartZoomManager {
 		double y = mouseEvent.getY();
 
 		Rectangle2D plotArea = chartInfo.getPlotArea();
+		DefaultChartInputContext context = new DefaultChartInputContext( chartInfo, x, y );
+		zoomMode = axisConstraintStrategy.getConstraint(context);
 
-		if ( plotArea.contains( x, y ) ) {
+		if ( zoomMode == AxisConstraint.Both ) {
 			selectRect.setTranslateX( x );
 			selectRect.setTranslateY( y );
 			rectX.set( x );
 			rectY.set( y );
-			zoomMode = ZoomMode.Both;
 
-		} else if ( chartInfo.getXAxisArea().contains( x, y ) ) {
+		} else if ( zoomMode == AxisConstraint.Horizontal ) {
 			selectRect.setTranslateX( x );
 			selectRect.setTranslateY( plotArea.getMinY() );
 			rectX.set( x );
 			rectY.set( plotArea.getMaxY() );
-			zoomMode = ZoomMode.Horizontal;
+			zoomMode = AxisConstraint.Horizontal;
 
-		} else if ( chartInfo.getYAxisArea().contains( x, y ) ) {
+		} else if ( zoomMode == AxisConstraint.Vertical ) {
 			selectRect.setTranslateX( plotArea.getMinX() );
 			selectRect.setTranslateY( y );
 			rectX.set( plotArea.getMaxX() );
 			rectY.set( y );
-			zoomMode = ZoomMode.Vertical;
+			zoomMode = AxisConstraint.Vertical;
 		}
 	}
 
 	private void onDragStart() {
 		//Don't actually start the selecting process until it's officially a drag
 		//But, we saved the original coordinates from where we started.
-		selecting.set( true );
+		if ( zoomMode != AxisConstraint.None )
+			selecting.set( true );
 	}
 
 	private void onMouseDragged( MouseEvent mouseEvent ) {
@@ -331,7 +371,7 @@ public class ChartZoomManager {
 
 		Rectangle2D plotArea = chartInfo.getPlotArea();
 
-		if ( zoomMode == ZoomMode.Both || zoomMode == ZoomMode.Horizontal ) {
+		if ( zoomMode == AxisConstraint.Both || zoomMode == AxisConstraint.Horizontal ) {
 			double x = mouseEvent.getX();
 			//Clamp to the selection start
 			x = Math.max( x, selectRect.getTranslateX() );
@@ -340,7 +380,7 @@ public class ChartZoomManager {
 			rectX.set( x );
 		}
 
-		if ( zoomMode == ZoomMode.Both || zoomMode == ZoomMode.Vertical ) {
+		if ( zoomMode == AxisConstraint.Both || zoomMode == AxisConstraint.Vertical ) {
 			double y = mouseEvent.getY();
 			//Clamp to the selection start
 			y = Math.max( y, selectRect.getTranslateY() );
@@ -430,25 +470,21 @@ public class ChartZoomManager {
 			            //mouse wheel always has touch count of 0
 			            event.getTouchCount() == 0 ) {
 
+				//Find out which axes to zoom based on the strategy
+				double eventX = event.getX();
+				double eventY = event.getY();
+				DefaultChartInputContext context = new DefaultChartInputContext( chartInfo, eventX, eventY );
+				AxisConstraint zoomMode = mouseWheelAxisConstraintStrategy.getConstraint( context );
+
+				if ( zoomMode == AxisConstraint.None )
+					return;
+
 				//If we are are doing a zoom animation, stop it. Also of note is that we don't zoom the
 				//mouse wheel zooming. Because the mouse wheel can "fly" and generate a lot of events,
 				//animation doesn't work well. Plus, as the mouse wheel changes the view a small amount in
 				//a predictable way, it "looks like" an animation when you roll it.
 				//We might experiment with mouse wheel zoom animation in the future, though.
 				zoomAnimation.stop();
-
-				//If we wheel zoom on either axis, we restrict zooming to that axis only, else if anywhere
-				//else, including the plot area, zoom both axes.
-				ZoomMode zoomMode;
-				double eventX = event.getX();
-				double eventY = event.getY();
-				if ( chartInfo.getXAxisArea().contains( eventX, eventY ) ) {
-					zoomMode = ZoomMode.Horizontal;
-				} else if ( chartInfo.getYAxisArea().contains( eventX, eventY ) ) {
-					zoomMode = ZoomMode.Vertical;
-				} else {
-					zoomMode = ZoomMode.Both;
-				}
 
 				//At this point we are a mouse wheel event, based on everything I've read
 				Point2D dataCoords = chartInfo.getDataCoordinates( eventX, eventY );
@@ -467,14 +503,14 @@ public class ChartZoomManager {
 				//If so, the 0.2 needs to be modified
 				double zoomAmount = 0.2 * direction;
 
-				if ( zoomMode == ZoomMode.Both || zoomMode == ZoomMode.Horizontal ) {
+				if ( zoomMode == AxisConstraint.Both || zoomMode == AxisConstraint.Horizontal ) {
 					double xZoomDelta = ( xAxis.getUpperBound() - xAxis.getLowerBound() ) * zoomAmount;
 					xAxis.setAutoRanging( false );
 					xAxis.setLowerBound( xAxis.getLowerBound() - xZoomDelta * xZoomBalance );
 					xAxis.setUpperBound( xAxis.getUpperBound() + xZoomDelta * ( 1 - xZoomBalance ) );
 				}
 
-				if ( zoomMode == ZoomMode.Both || zoomMode == ZoomMode.Vertical ) {
+				if ( zoomMode == AxisConstraint.Both || zoomMode == AxisConstraint.Vertical ) {
 					double yZoomDelta = ( yAxis.getUpperBound() - yAxis.getLowerBound() ) * zoomAmount;
 					yAxis.setAutoRanging( false );
 					yAxis.setLowerBound( yAxis.getLowerBound() - yZoomDelta * yZoomBalance );

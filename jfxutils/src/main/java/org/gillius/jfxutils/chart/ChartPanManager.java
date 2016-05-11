@@ -21,7 +21,6 @@ import javafx.event.EventHandler;
 import javafx.scene.chart.ValueAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Pane;
 import org.gillius.jfxutils.EventHandlerManager;
 
 /**
@@ -43,9 +42,8 @@ public class ChartPanManager {
 	private final ValueAxis<?> yAxis;
 	private final XYChartInfo chartInfo;
 
-	private enum PanMode { Horizontal, Vertical, Both }
-
-	private PanMode panMode;
+	private AxisConstraint panMode = AxisConstraint.None;
+	private AxisConstraintStrategy axisConstraintStrategy = AxisConstraintStrategies.getDefault();
 
 	private EventHandler<? super MouseEvent> mouseFilter = DEFAULT_FILTER;
 
@@ -87,6 +85,25 @@ public class ChartPanManager {
 	}
 
 	/**
+	 * Returns the current strategy in use.
+	 *
+	 * @see #setAxisConstraintStrategy(AxisConstraintStrategy)
+	 */
+	public AxisConstraintStrategy getAxisConstraintStrategy() {
+		return axisConstraintStrategy;
+	}
+
+	/**
+	 * Sets the {@link AxisConstraintStrategy} to use, which determines which axis is allowed for panning. The default
+	 * implementation is {@link AxisConstraintStrategies#getDefault()}.
+	 *
+	 * @see AxisConstraintStrategies
+	 */
+	public void setAxisConstraintStrategy( AxisConstraintStrategy axisConstraintStrategy ) {
+		this.axisConstraintStrategy = axisConstraintStrategy;
+	}
+
+	/**
 	 * Returns the mouse filter.
 	 *
 	 * @see #setMouseFilter(EventHandler)
@@ -125,35 +142,30 @@ public class ChartPanManager {
 	}
 
 	private void startDrag( MouseEvent event ) {
-		lastX = event.getX();
-		lastY = event.getY();
+		DefaultChartInputContext context = new DefaultChartInputContext( chartInfo, event.getX(), event.getY() );
+		panMode = axisConstraintStrategy.getConstraint( context );
 
-		wasXAnimated = xAxis.getAnimated();
-		wasYAnimated = yAxis.getAnimated();
+		if (panMode != AxisConstraint.None) {
+			lastX = event.getX();
+			lastY = event.getY();
 
-		xAxis.setAnimated( false );
-		xAxis.setAutoRanging( false );
-		yAxis.setAnimated( false );
-		yAxis.setAutoRanging( false );
+			wasXAnimated = xAxis.getAnimated();
+			wasYAnimated = yAxis.getAnimated();
 
-		if ( chartInfo.getXAxisArea().contains( lastX, lastY ) ) {
-			panMode = PanMode.Horizontal;
-		} else if ( chartInfo.getYAxisArea().contains( lastX, lastY ) ) {
-			panMode = PanMode.Vertical;
-		} else {
-			// probably chartInfo.getPlotArea().contains( lastX, lastY ), 
-			// but not necessarily, e.g. in the corners/title/etc.
-			panMode = PanMode.Both;	
+			xAxis.setAnimated( false );
+			xAxis.setAutoRanging( false );
+			yAxis.setAnimated( false );
+			yAxis.setAutoRanging( false );
+
+			dragging = true;
 		}
-
-		dragging = true;
 	}
 
 	private void drag( MouseEvent event ) {
 		if ( !dragging )
 			return;
 
-		if ( panMode == PanMode.Both || panMode == PanMode.Horizontal ) {
+		if ( panMode == AxisConstraint.Both || panMode == AxisConstraint.Horizontal ) {
 			double dX = ( event.getX() - lastX ) / -xAxis.getScale();
 			lastX = event.getX();
 			xAxis.setAutoRanging( false );
@@ -161,7 +173,7 @@ public class ChartPanManager {
 			xAxis.setUpperBound( xAxis.getUpperBound() + dX );
 		}
 
-		if ( panMode == PanMode.Both || panMode == PanMode.Vertical ) {
+		if ( panMode == AxisConstraint.Both || panMode == AxisConstraint.Vertical ) {
 			double dY = ( event.getY() - lastY ) / -yAxis.getScale();
 			lastY = event.getY();
 			yAxis.setAutoRanging( false );
