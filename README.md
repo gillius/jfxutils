@@ -9,14 +9,13 @@ Development version: 0.4-SNAPSHOT
 
 * Add zooming functionality to a JavaFX XYChart:
   * Drag mouse in plot area to zoom both axes
-    * (0.4) #4 constrain panning to horizontal or vertical axis
-  * Drag mouse on X axis to zoom that axis only
-  * Drag moues on Y axis to zoom that axis only
+  * Drag mouse on X or Y axis to zoom that axis only
   * (0.2) Mouse filter, for example allow only left click drag to zoom
   * (0.2) Animated zooming
   * (0.3) Mouse wheel zoom in plot area, X axis, or Y axis. This has NOT been tested with mice with "continuous" wheels, only ones that rotate in discrete steps/clicks.
 * (0.2) Panning ability for XYCharts
   * Mouse filtering, for example right click drag or ctrl+left click for panning
+  * (0.4) #4 Drag mouse on X or Y axis to pan that axis only
 * (0.2) StableTicksAxis provides the same tick locations for a zoom level, regardless of the lower and upper bounds. This provides a much smoother experience when panning and zooming.
   * (0.4) Ability to customize axis label formatting of StableTicksAxis
 * Ability to create a Pane that scales when it resizes instead of reflowing its layout, creating an effect like a presentation slide.
