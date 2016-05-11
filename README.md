@@ -1,7 +1,7 @@
 jfxutils
 ========
 
-JavaFX Utilities - Zoom and Pan Charts and Pane Scaling
+JavaFX Utilities - Zoom and Pan Charts and Pane Scaling for JDK 7+
 
 License: Apache 2<br/>
 Latest Release: 0.3<br/>
