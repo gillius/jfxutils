@@ -18,7 +18,9 @@ package org.gillius.jfxutils.chart;
 
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.chart.XYChart;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
@@ -86,5 +88,50 @@ public class JFXChartUtil {
 		zoomManager.setMouseFilter( mouseFilter );
 		zoomManager.start();
 		return chartPane;
+	}
+
+	/**
+	 * Calls {@link #addDoublePrimaryClickAutoRangeHandler(XYChart, Node)} with the chart as the target.
+	 */
+	public static EventHandler<MouseEvent> addDoublePrimaryClickAutoRangeHandler( final XYChart<?, ?> chart ) {
+		return addDoublePrimaryClickAutoRangeHandler( chart, chart );
+	}
+
+	/**
+	 * Adds a handler that sets X and/or Y axis auto ranging when the primary mouse button is double-clicked. If the click
+	 * occurs inside the X axis area auto range only the X axis and similarly for Y axis. But if the event is in the plot
+	 * area or anywhere else, auto range both axes.
+	 *
+	 * @param chart  chart whose axes to auto range
+	 * @param target handler listens for {@link MouseEvent}s on this {@link Node}
+	 *
+	 * @return the {@link EventHandler} added to 'target' for {@link MouseEvent}.
+	 */
+	public static EventHandler<MouseEvent> addDoublePrimaryClickAutoRangeHandler( XYChart<?, ?> chart, Node target ) {
+		XYChartInfo chartInfo = new XYChartInfo( chart, target );
+		EventHandler<MouseEvent> handler = getDoublePrimaryClickAutoRangeHandler( chartInfo );
+		target.addEventHandler( MouseEvent.MOUSE_CLICKED, handler );
+		return handler;
+	}
+
+	/**
+	 * Returns an {@link EventHandler} that sets X and/or Y axis auto ranging when the primary mouse button is
+	 * double-clicked. If the click occurs inside the X axis area auto range only the X axis and similarly for Y axis. But
+	 * if the event is in the plot area or anywhere else, auto range both axes.
+	 */
+	public static EventHandler<MouseEvent> getDoublePrimaryClickAutoRangeHandler( final XYChartInfo chartInfo ) {
+		return new EventHandler<MouseEvent>() {
+			@Override
+			public void handle( MouseEvent event ) {
+				if ( event.getClickCount() == 2 && event.getButton() == MouseButton.PRIMARY ) {
+					double x = event.getX();
+					double y = event.getY();
+					if ( !chartInfo.getXAxisArea().contains( x, y ) )
+						chartInfo.getChart().getYAxis().setAutoRanging( true );
+					if ( !chartInfo.getYAxisArea().contains( x, y ) )
+						chartInfo.getChart().getXAxis().setAutoRanging( true );
+				}
+			}
+		};
 	}
 }

@@ -180,5 +180,7 @@ public class Charting extends Application {
 					mouseEvent.consume();
 			}
 		} );
+
+		JFXChartUtil.addDoublePrimaryClickAutoRangeHandler( chart );
 	}
 }
