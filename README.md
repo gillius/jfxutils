@@ -13,6 +13,7 @@ Development version: 1.0-SNAPSHOT
   * (0.2) Mouse filter, for example allow only left click drag to zoom
   * (0.2) Animated zooming
   * (0.3) Mouse wheel zoom in plot area, X axis, or Y axis. This has NOT been tested with mice with "continuous" wheels, only ones that rotate in discrete steps/clicks.
+  * (1.0) [#9](https://github.com/gillius/jfxutils/issues/9) Allow reset to auto-zoom on double click
 * (0.2) Panning ability for XYCharts
   * Mouse filtering, for example right click drag or ctrl+left click for panning
   * (1.0) [#5](https://github.com/gillius/jfxutils/issues/4) Drag mouse on X or Y axis to pan that axis only. Configurable via an AxisConstraintStrategy implementation [(#5)](https://github.com/gillius/jfxutils/issues/5).
