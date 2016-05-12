@@ -1,29 +1,29 @@
 jfxutils
 ========
 
-JavaFX Utilities - Zoom and Pan Charts and Pane Scaling for JDK 7+
+JavaFX Utilities - Zoom and Pan Charts and Pane Scaling for JDK 7+ (including JDK 8)
 
 License: Apache 2<br/>
 Latest Release: 0.3<br/>
-Development version: 0.4-SNAPSHOT
+Development version: 1.0-SNAPSHOT
 
 * Add zooming functionality to a JavaFX XYChart:
   * Drag mouse in plot area to zoom both axes, or on X or Y axis to zoom that axis only.
-    * (0.4) #5 Configurable via an AxisConstraintStrategy implementation.
+    * (1.0) [#5](https://github.com/gillius/jfxutils/issues/5) Configurable via an AxisConstraintStrategy implementation.
   * (0.2) Mouse filter, for example allow only left click drag to zoom
   * (0.2) Animated zooming
   * (0.3) Mouse wheel zoom in plot area, X axis, or Y axis. This has NOT been tested with mice with "continuous" wheels, only ones that rotate in discrete steps/clicks.
 * (0.2) Panning ability for XYCharts
   * Mouse filtering, for example right click drag or ctrl+left click for panning
-  * (0.4) #4 Drag mouse on X or Y axis to pan that axis only. Configurable via an AxisConstraintStrategy implementation (#5).
+  * (1.0) [#5](https://github.com/gillius/jfxutils/issues/4) Drag mouse on X or Y axis to pan that axis only. Configurable via an AxisConstraintStrategy implementation [(#5)](https://github.com/gillius/jfxutils/issues/5).
 * (0.2) StableTicksAxis provides the same tick locations for a zoom level, regardless of the lower and upper bounds. This provides a much smoother experience when panning and zooming.
-  * (0.4) Ability to customize axis label formatting of StableTicksAxis
+  * (1.0) Ability to customize axis label formatting of StableTicksAxis
 * Ability to create a Pane that scales when it resizes instead of reflowing its layout, creating an effect like a presentation slide.
 * An experimental way to replace a Node in the scene graph with a different one (it's not as easy as you think)
 * A way to get X and Y offsets of a Node from an arbitrary ancestor in a way that handles translation/padding/layout, etc., but does not yet handle scale and rotations (this might be possible if transforms can be combined as rumored for JFX 8)
 
-Bug Fixes in 0.4
-----------------
+Bug Fixes in 1.0 since 0.3
+--------------------------
 
 * By Daniel Weil: if the data range is very small, StableTicksAxis does not work well. So, if the range is less than 1e-300, range the axis as if min==max (which will show a straight line).
 
@@ -47,7 +47,7 @@ Maven - Latest Release
 </dependency>
 ```
 
-javadoc and sources variants are also available. The development verison is 0.4-SNAPSHOT, if you want that version, replace the 0.3 with 0.4-SNAPSHOT. If you need an official 0.4 release, just ask and I'll do it.
+javadoc and sources variants are also available. The development version is 1.0-SNAPSHOT, if you want that version, replace the 0.3 with 1.0-SNAPSHOT. If you need an official 1.0 release, just ask and I'll do it.
 
 Documentation
 -------------
