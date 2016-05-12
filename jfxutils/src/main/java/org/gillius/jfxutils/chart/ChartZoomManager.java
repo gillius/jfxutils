@@ -347,14 +347,12 @@ public class ChartZoomManager {
 			selectRect.setTranslateY( plotArea.getMinY() );
 			rectX.set( x );
 			rectY.set( plotArea.getMaxY() );
-			zoomMode = AxisConstraint.Horizontal;
 
 		} else if ( zoomMode == AxisConstraint.Vertical ) {
 			selectRect.setTranslateX( plotArea.getMinX() );
 			selectRect.setTranslateY( y );
 			rectX.set( plotArea.getMaxX() );
 			rectY.set( y );
-			zoomMode = AxisConstraint.Vertical;
 		}
 	}
 
