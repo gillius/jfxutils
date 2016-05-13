@@ -48,7 +48,25 @@ Maven - Latest Release
 </dependency>
 ```
 
-javadoc and sources variants are also available. The development version is 1.0-SNAPSHOT, if you want that version, replace the 0.3 with 1.0-SNAPSHOT. If you need an official 1.0 release, just ask and I'll do it.
+javadoc and sources variants are also available.
+
+Starting with jfxutils 1.0, the project will be deployed to the Maven Central Repository. Currently it is possible to get 1.0-SNAPSHOT from there:
+
+```xml
+<repositories>
+  <repository>
+    <id>ossrh</id>
+    <name>OSSRH Snapshots</name>
+    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+  </repository>
+</repositories>
+
+<dependency>
+  <groupId>org.gillius</groupId>
+  <artifactId>jfxutils</artifactId>
+  <version>0.3</version>
+</dependency>
+```
 
 Documentation
 -------------
