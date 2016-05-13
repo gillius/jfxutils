@@ -57,6 +57,16 @@
 		</developer>
 	</developers>
 
+	<contributors>
+		<contributor>
+			<name>Daniel Weil</name>
+		</contributor>
+		<contributor>
+			<name>gforman44</name>
+			<url>https://github.com/gforman44</url>
+		</contributor>
+	</contributors>
+
 	<scm>
 		<connection>scm:git:https://github.com/gillius/jfxutils.git</connection>
 		<developerConnection>scm:git:git@github.com:gillius/jfxutils.git</developerConnection>
