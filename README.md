@@ -64,7 +64,7 @@ Starting with jfxutils 1.0, the project will be deployed to the Maven Central Re
 <dependency>
   <groupId>org.gillius</groupId>
   <artifactId>jfxutils</artifactId>
-  <version>0.3</version>
+  <version>1.0-SNAPSHOT</version>
 </dependency>
 ```
 
