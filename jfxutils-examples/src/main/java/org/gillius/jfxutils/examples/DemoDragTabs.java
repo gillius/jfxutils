@@ -37,11 +37,9 @@ import org.gillius.jfxutils.tab.TabUtil;
  * @author gforman44
  */
 public class DemoDragTabs extends Application {
-	private static Tab makeTab( String tabName, String tabContentDummy) {
-		Tab t = new Tab();
-		t.setGraphic(new Label(tabName)); // NOTE: must use setGraphic for this, not just a text label
+	private static Tab makeTab( String tabName, String tabContentDummy ) {
+		Tab t = TabUtil.newDraggableTab( tabName );
 		t.setContent(new Label(tabContentDummy));
-		TabUtil.makeDraggable(t); ///////////////// see
 		return t;
 	}
 
