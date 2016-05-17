@@ -4,7 +4,7 @@ jfxutils
 JavaFX Utilities - Zoom and Pan Charts and Pane Scaling for JDK 7+ (including JDK 8)
 
 License: Apache 2<br/>
-Latest Release: 0.3<br/>
+Latest Release: 0.3.1<br/>
 Development version: 1.0-SNAPSHOT
 
 * Add zooming functionality to a JavaFX XYChart:
@@ -31,16 +31,13 @@ Bug Fixes in 1.0 since 0.3
 Getting
 -------
 
-Maven - Latest Release
-```xml
-<repositories>
-  <repository>
-    <id>gillius-org</id>
-    <name>Gillius.org Maven Repository</name>
-    <url>http://www.gillius.org/maven2</url>
-  </repository>
-</repositories>
+### Latest Release
 
+Starting with jfxutils 0.3.1, all releases are available in the Maven Central Repository. All builds also have javadoc
+and source variants available. The 0.3.1 release is the same as 0.3, except the POMs have been updated for deployment
+to the Central Repository.
+
+```xml
 <dependency>
   <groupId>org.gillius</groupId>
   <artifactId>jfxutils</artifactId>
@@ -48,9 +45,10 @@ Maven - Latest Release
 </dependency>
 ```
 
-javadoc and sources variants are also available.
+### Latest Snapshot
 
-Starting with jfxutils 1.0, the project will be deployed to the Maven Central Repository. Currently it is possible to get 1.0-SNAPSHOT from there:
+The development version of jfxutils is 1.0-SNAPSHOT, available at https://oss.sonatype.org/content/repositories/snapshots.
+First, add to your POM or repository manager a link to the OSSRH repository:
 
 ```xml
 <repositories>
@@ -60,7 +58,11 @@ Starting with jfxutils 1.0, the project will be deployed to the Maven Central Re
     <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
   </repository>
 </repositories>
+```
 
+Then you can add dependency on the snapshot:
+
+```xml
 <dependency>
   <groupId>org.gillius</groupId>
   <artifactId>jfxutils</artifactId>
@@ -68,11 +70,34 @@ Starting with jfxutils 1.0, the project will be deployed to the Maven Central Re
 </dependency>
 ```
 
+### Old Releases
+
+jfxutils 0.3 and earlier were never published at Maven Central Repository and only at the gillius.org repository.
+
+```xml
+<repositories>
+  <repository>
+    <id>gillius-org</id>
+    <name>Gillius.org Maven Repository</name>
+    <url>http://www.gillius.org/maven2</url>
+  </repository>
+</repositories>
+```
+
+Then add the following to your dependencies section:
+```xml
+<dependency>
+  <groupId>org.gillius</groupId>
+  <artifactId>jfxutils</artifactId>
+  <version>0.3</version>
+</dependency>
+```
+
 Documentation
 -------------
 
-* Documentation for latest release: http://gillius.org/jfxutils/docs/latest/
-* Documentation for 0.3: http://gillius.org/jfxutils/docs/0.3/
+* Documentation for 1.0-SNAPSHOT: http://gillius.org/jfxutils/docs/latest/
+* Documentation for 0.3/0.3.1: http://gillius.org/jfxutils/docs/0.3/
 
 Screenshot
 ----------
