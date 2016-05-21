@@ -4,8 +4,8 @@ jfxutils
 JavaFX Utilities - Zoom and Pan Charts and Pane Scaling for JDK 7+ (including JDK 8)
 
 License: Apache 2<br/>
-Latest Release: 0.3.1<br/>
-Development version: 1.0-SNAPSHOT
+Latest Release: 1.0<br/>
+Development version: No work past 1.0 done yet.
 
 * Add zooming functionality to a JavaFX XYChart:
   * Drag mouse in plot area to zoom both axes, or on X or Y axis to zoom that axis only.
@@ -42,14 +42,14 @@ to the Central Repository.
 <dependency>
   <groupId>org.gillius</groupId>
   <artifactId>jfxutils</artifactId>
-  <version>0.3</version>
+  <version>1.0</version>
 </dependency>
 ```
 
 ### Latest Snapshot
 
-The development version of jfxutils is 1.0-SNAPSHOT, available at https://oss.sonatype.org/content/repositories/snapshots.
-First, add to your POM or repository manager a link to the OSSRH repository:
+Currently there is no development snapshot version, since no development has occurred since 1.0. However, settings when
+there is a snapshot are configured as below:
 
 ```xml
 <repositories>
@@ -73,7 +73,8 @@ Then you can add dependency on the snapshot:
 
 ### Old Releases
 
-jfxutils 0.3 and earlier were never published at Maven Central Repository and only at the gillius.org repository.
+jfxutils 0.3 and earlier were never published at Maven Central Repository and only at the gillius.org repository. Note
+for 0.3, I made a release 0.3.1 with the same code that is published at Maven Central.
 
 ```xml
 <repositories>
@@ -97,7 +98,7 @@ Then add the following to your dependencies section:
 Documentation
 -------------
 
-* Documentation for 1.0-SNAPSHOT: http://gillius.org/jfxutils/docs/latest/
+* Documentation for 1.0: http://gillius.org/jfxutils/docs/latest/
 * Documentation for 0.3/0.3.1: http://gillius.org/jfxutils/docs/0.3/
 
 Screenshot
@@ -110,11 +111,6 @@ Here is a screenshot showing the example application in the jfxutils-example art
 Here is the charting application using the NumberAxis after zooming and panning, showing the awkward tick labels that result, as NumberAxis tick labels are fixed with the graph's graphical layout and not fixed relative to the data:
 
 ![JFXUtils charting example using StableTicksAxis](https://raw.github.com/gillius/jfxutils/master/web/screenshots/NumberAxisGraph.png)
-
-Future Work
------------
-
-* (Maybe) Default widget panel with buttons to switch between zooming and panning
 
 Building under JDK 7
 --------------------
