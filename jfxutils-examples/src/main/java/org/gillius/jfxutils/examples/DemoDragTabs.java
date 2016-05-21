@@ -33,6 +33,7 @@ import org.gillius.jfxutils.tab.TabUtil;
  * <pre>
  * t = new Tab();
  * t.setGraphic(new Label("Label"));
+ * </pre>
  *
  * @author gforman44
  */
