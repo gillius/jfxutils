@@ -10,16 +10,17 @@ Development version: 1.0-SNAPSHOT
 * Add zooming functionality to a JavaFX XYChart:
   * Drag mouse in plot area to zoom both axes, or on X or Y axis to zoom that axis only.
     * (1.0) [#5](https://github.com/gillius/jfxutils/issues/5) Configurable via an AxisConstraintStrategy implementation.
-  * (0.2) Mouse filter, for example allow only left click drag to zoom
-  * (0.2) Animated zooming
-  * (0.3) Mouse wheel zoom in plot area, X axis, or Y axis. This has NOT been tested with mice with "continuous" wheels, only ones that rotate in discrete steps/clicks.
+  * Mouse filter, for example allow only left click drag to zoom
+  * Animated zooming
+  * Mouse wheel zoom in plot area, X axis, or Y axis. This has NOT been tested with mice with "continuous" wheels, only ones that rotate in discrete steps/clicks.
   * (1.0) [#9](https://github.com/gillius/jfxutils/issues/9) Allow reset to auto-zoom on double click
-* (0.2) Panning ability for XYCharts
+* (Panning ability for XYCharts
   * Mouse filtering, for example right click drag or ctrl+left click for panning
   * (1.0) [#5](https://github.com/gillius/jfxutils/issues/4) Drag mouse on X or Y axis to pan that axis only. Configurable via an AxisConstraintStrategy implementation [(#5)](https://github.com/gillius/jfxutils/issues/5).
-* (0.2) StableTicksAxis provides the same tick locations for a zoom level, regardless of the lower and upper bounds. This provides a much smoother experience when panning and zooming.
+* StableTicksAxis provides the same tick locations for a zoom level, regardless of the lower and upper bounds. This provides a much smoother experience when panning and zooming.
   * (1.0) Ability to customize axis label formatting of StableTicksAxis
 * Ability to create a Pane that scales when it resizes instead of reflowing its layout, creating an effect like a presentation slide.
+* (1.0) [#10](https://github.com/gillius/jfxutils/issues/10) TabUtil to create tabs that can do drag and drop between TabPanes.
 * An experimental way to replace a Node in the scene graph with a different one (it's not as easy as you think)
 * A way to get X and Y offsets of a Node from an arbitrary ancestor in a way that handles translation/padding/layout, etc., but does not yet handle scale and rotations (this might be possible if transforms can be combined as rumored for JFX 8)
 
