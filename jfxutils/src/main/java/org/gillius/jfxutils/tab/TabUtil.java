@@ -77,7 +77,7 @@ public class TabUtil {
 		tabPane.setOnDragOver( new EventHandler<DragEvent>() {
 			@Override
 			public void handle( DragEvent event ) {
-				if ( event.getDragboard().hasContent( TAB_TYPE ) ) {
+				if ( dndTab != null && event.getDragboard().hasContent( TAB_TYPE ) ) {
 					Tab tab = dndTab.get();
 					if ( tab != null && tab.getTabPane() != tabPane ) {// && different from source location
 						event.acceptTransferModes( TransferMode.MOVE );
@@ -89,7 +89,7 @@ public class TabUtil {
 		tabPane.setOnDragDropped( new EventHandler<DragEvent>() {
 			@Override
 			public void handle( DragEvent event ) {
-				if ( event.getDragboard().hasContent( TAB_TYPE ) ) {
+				if ( dndTab != null && event.getDragboard().hasContent( TAB_TYPE ) ) {
 					Tab tab = dndTab.get();
 					if ( tab != null && tab.getTabPane() != tabPane ) {// && different from source location
 						tab.getTabPane().getTabs().remove( tab );
