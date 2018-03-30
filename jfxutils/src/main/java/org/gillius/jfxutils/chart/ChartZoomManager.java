@@ -16,18 +16,24 @@
 
 package org.gillius.jfxutils.chart;
 
+import java.lang.reflect.InvocationTargetException;
+
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.Property;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.chart.Axis;
 import javafx.scene.chart.ValueAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.input.MouseButton;
@@ -36,6 +42,8 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
+import javafx.util.StringConverter;
+
 import org.gillius.jfxutils.EventHandlerManager;
 
 /**
@@ -87,6 +95,7 @@ ChartZoomManager zoomManager = new ChartZoomManager( chartPane, selectRect, char
 zoomManager.start();</pre>
  *
  * @author Jason Winnebeck
+ * @author Hollis Waite
  */
 public class ChartZoomManager {
 	/**
@@ -119,8 +128,12 @@ public class ChartZoomManager {
 	private final EventHandlerManager handlerManager;
 
 	private final Rectangle selectRect;
-	private final ValueAxis<?> xAxis;
-	private final ValueAxis<?> yAxis;
+	private final Axis<?> xAxis;
+	private final DoubleProperty xAxisLowerBoundProperty;
+	private final DoubleProperty xAxisUpperBoundProperty;
+	private final Axis<?> yAxis;
+	private final DoubleProperty yAxisLowerBoundProperty;
+	private final DoubleProperty yAxisUpperBoundProperty;
 	private final XYChartInfo chartInfo;
 
 	private final Timeline zoomAnimation = new Timeline();
@@ -132,10 +145,22 @@ public class ChartZoomManager {
 	 * @param selectRect A Rectangle whose layoutX/Y makes it line up with the chart
 	 * @param chart      Chart to manage, where both X and Y axis are a {@link ValueAxis}.
 	 */
-	public ChartZoomManager( Pane chartPane, Rectangle selectRect, XYChart<?,?> chart ) {
+	public <X,Y> ChartZoomManager( Pane chartPane, Rectangle selectRect, XYChart<X,Y> chart ) {
 		this.selectRect = selectRect;
-		this.xAxis = (ValueAxis<?>) chart.getXAxis();
-		this.yAxis = (ValueAxis<?>) chart.getYAxis();
+		this.xAxis = chart.getXAxis();
+		this.xAxisLowerBoundProperty = getLowerBoundProperty(xAxis);
+		this.xAxisUpperBoundProperty = getUpperBoundProperty(xAxis);
+		this.yAxis = chart.getYAxis();
+		this.yAxisLowerBoundProperty = getLowerBoundProperty(yAxis);
+		this.yAxisUpperBoundProperty = getUpperBoundProperty(yAxis);
+
+		if (
+			xAxisLowerBoundProperty == null || xAxisUpperBoundProperty == null ||
+			yAxisLowerBoundProperty == null || yAxisUpperBoundProperty == null
+		) {
+			throw new IllegalArgumentException("Axis type not supported");
+		}
+
 		chartInfo = new XYChartInfo( chart, chartPane );
 
 		handlerManager = new EventHandlerManager( chartPane );
@@ -410,25 +435,25 @@ public class ChartZoomManager {
 			zoomAnimation.stop();
 			zoomAnimation.getKeyFrames().setAll(
 					new KeyFrame( Duration.ZERO,
-					              new KeyValue( xAxis.lowerBoundProperty(), xAxis.getLowerBound() ),
-					              new KeyValue( xAxis.upperBoundProperty(), xAxis.getUpperBound() ),
-					              new KeyValue( yAxis.lowerBoundProperty(), yAxis.getLowerBound() ),
-					              new KeyValue( yAxis.upperBoundProperty(), yAxis.getUpperBound() )
+					              new KeyValue( xAxisLowerBoundProperty, getXAxisLowerBound() ),
+					              new KeyValue( xAxisUpperBoundProperty, getXAxisUpperBound() ),
+					              new KeyValue( yAxisLowerBoundProperty, getYAxisLowerBound() ),
+					              new KeyValue( yAxisUpperBoundProperty, getYAxisUpperBound() )
 					),
 			    new KeyFrame( Duration.millis( zoomDurationMillis.get() ),
-			                  new KeyValue( xAxis.lowerBoundProperty(), zoomWindow.getMinX() ),
-			                  new KeyValue( xAxis.upperBoundProperty(), zoomWindow.getMaxX() ),
-			                  new KeyValue( yAxis.lowerBoundProperty(), zoomWindow.getMinY() ),
-			                  new KeyValue( yAxis.upperBoundProperty(), zoomWindow.getMaxY() )
+			                  new KeyValue( xAxisLowerBoundProperty, zoomWindow.getMinX() ),
+			                  new KeyValue( xAxisUpperBoundProperty, zoomWindow.getMaxX() ),
+			                  new KeyValue( yAxisLowerBoundProperty, zoomWindow.getMinY() ),
+			                  new KeyValue( yAxisUpperBoundProperty, zoomWindow.getMaxY() )
 			    )
 			);
 			zoomAnimation.play();
 		} else {
 			zoomAnimation.stop();
-			xAxis.setLowerBound( zoomWindow.getMinX() );
-			xAxis.setUpperBound( zoomWindow.getMaxX() );
-			yAxis.setLowerBound( zoomWindow.getMinY() );
-			yAxis.setUpperBound( zoomWindow.getMaxY() );
+			setXAxisLowerBound( zoomWindow.getMinX() );
+			setXAxisUpperBound( zoomWindow.getMaxX() );
+			setYAxisLowerBound( zoomWindow.getMinY() );
+			setYAxisUpperBound( zoomWindow.getMaxY() );
 		}
 
 		selecting.set( false );
@@ -490,9 +515,9 @@ public class ChartZoomManager {
 				//Determine the proportion of change to the lower and upper bounds based on how far the
 				//cursor is along the axis.
 				double xZoomBalance = getBalance( dataCoords.getX(),
-				                                  xAxis.getLowerBound(), xAxis.getUpperBound() );
+				                                  getXAxisLowerBound(), getXAxisUpperBound() );
 				double yZoomBalance = getBalance( dataCoords.getY(),
-				                                  yAxis.getLowerBound(), yAxis.getUpperBound() );
+				                                  getYAxisLowerBound(), getYAxisUpperBound() );
 
 				//Are we zooming in or out, based on the direction of the roll
 				double direction = -Math.signum( event.getDeltaY() );
@@ -502,19 +527,112 @@ public class ChartZoomManager {
 				double zoomAmount = 0.2 * direction;
 
 				if ( zoomMode == AxisConstraint.Both || zoomMode == AxisConstraint.Horizontal ) {
-					double xZoomDelta = ( xAxis.getUpperBound() - xAxis.getLowerBound() ) * zoomAmount;
+					double xZoomDelta = ( getXAxisUpperBound() - getXAxisLowerBound() ) * zoomAmount;
 					xAxis.setAutoRanging( false );
-					xAxis.setLowerBound( xAxis.getLowerBound() - xZoomDelta * xZoomBalance );
-					xAxis.setUpperBound( xAxis.getUpperBound() + xZoomDelta * ( 1 - xZoomBalance ) );
+					setXAxisLowerBound( getXAxisLowerBound() - xZoomDelta * xZoomBalance );
+					setXAxisUpperBound( getXAxisUpperBound() + xZoomDelta * ( 1 - xZoomBalance ) );
 				}
 
 				if ( zoomMode == AxisConstraint.Both || zoomMode == AxisConstraint.Vertical ) {
-					double yZoomDelta = ( yAxis.getUpperBound() - yAxis.getLowerBound() ) * zoomAmount;
+					double yZoomDelta = ( getYAxisUpperBound() - getYAxisLowerBound() ) * zoomAmount;
 					yAxis.setAutoRanging( false );
-					yAxis.setLowerBound( yAxis.getLowerBound() - yZoomDelta * yZoomBalance );
-					yAxis.setUpperBound( yAxis.getUpperBound() + yZoomDelta * ( 1 - yZoomBalance ) );
+					setYAxisLowerBound( getYAxisLowerBound() - yZoomDelta * yZoomBalance );
+					setYAxisUpperBound( getYAxisUpperBound() + yZoomDelta * ( 1 - yZoomBalance ) );
 				}
 			}
 		}
+	}
+
+	private double getXAxisLowerBound() {
+		return xAxisLowerBoundProperty.get();
+	}
+
+	private void setXAxisLowerBound(double val) {
+		xAxisLowerBoundProperty.set(val);
+	}
+
+	private double getXAxisUpperBound() {
+		return xAxisUpperBoundProperty.get();
+	}
+
+	private void setXAxisUpperBound(double val) {
+		xAxisUpperBoundProperty.set(val);
+	}
+
+	private double getYAxisLowerBound() {
+		return yAxisLowerBoundProperty.get();
+	}
+
+	private void setYAxisLowerBound(double val) {
+		yAxisLowerBoundProperty.set(val);
+	}
+
+	private double getYAxisUpperBound() {
+		return yAxisUpperBoundProperty.get();
+	}
+
+	private void setYAxisUpperBound(double val) {
+		yAxisUpperBoundProperty.set(val);
+	}
+
+	private <T> DoubleProperty getLowerBoundProperty(Axis<T> axis) {
+		return axis instanceof ValueAxis ?
+				((ValueAxis<?>) axis).lowerBoundProperty() :
+				toDoubleProperty(axis, getProperty(axis, "lowerBoundProperty"));
+	}
+
+	private <T> DoubleProperty getUpperBoundProperty(Axis<T> axis) {
+		return axis instanceof ValueAxis ?
+				((ValueAxis<?>) axis).upperBoundProperty() :
+				toDoubleProperty(axis, getProperty(axis, "upperBoundProperty"));
+	}
+
+	private <T> DoubleProperty toDoubleProperty(Axis<T> axis, Property<T> property) {
+		final StringProperty stringProperty = new SimpleStringProperty();
+		final DoubleProperty doubleProperty = new SimpleDoubleProperty() {
+			// keep a reference so that the stringProperty doesn't get garbage-collected
+			private final StringProperty stringProp = stringProperty;
+		};
+
+		stringProperty.bindBidirectional(
+			doubleProperty,
+			new StringConverter<Number>() {
+				@Override
+				public String toString(Number val) {
+					return val == null ? null : Double.toString(val.doubleValue());
+				}
+
+				@Override
+				public Double fromString(String string) {
+					return string == null ? null : Double.parseDouble(string);
+				}
+			}
+		);
+
+		stringProperty.bindBidirectional(
+			property,
+			new StringConverter<T>() {
+				@Override
+				public String toString(T obj) {
+					return obj == null ? null : Double.toString(axis.toNumericValue(obj));
+				}
+
+				@Override
+				public T fromString(String string) {
+					return string == null ? null : axis.toRealValue(Double.parseDouble(string));
+				}
+			}
+		);
+
+		return doubleProperty;
+	}
+
+	private <T> Property<T> getProperty(Object object, String method) {
+		try {
+			Object result = object.getClass().getMethod(method).invoke(object);
+			return result instanceof Property ? (Property<T>) result : null;
+		} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {}
+
+		return null;
 	}
 }
