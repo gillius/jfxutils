@@ -21,6 +21,7 @@ import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
@@ -35,7 +36,6 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
-
 import org.gillius.jfxutils.EventHandlerManager;
 
 import java.lang.reflect.InvocationTargetException;
@@ -581,7 +581,7 @@ public class ChartZoomManager {
 				toDoubleProperty(axis, ChartZoomManager.<T>getProperty(axis, "upperBoundProperty") );
 	}
 
-	private static <T> DoubleProperty toDoubleProperty( final Axis<T> axis, Property<T> property ) {
+	private static <T> DoubleProperty toDoubleProperty( final Axis<T> axis, final Property<T> property ) {
 		final ChangeListener<Number>[] doubleChangeListenerAry = new ChangeListener[1];
 		final ChangeListener<T>[] realValListenerAry = new ChangeListener[1];
 
@@ -592,21 +592,27 @@ public class ChartZoomManager {
 			};
 		};
 
-		doubleChangeListenerAry[0] = (observable, oldValue, newValue) -> {
-            property.removeListener(realValListenerAry[0]);
-            property.setValue(axis.toRealValue(
-            	newValue == null ? null : newValue.doubleValue())
-           	);
-            property.addListener(realValListenerAry[0]);
-        };
-        result.addListener(doubleChangeListenerAry[0]);
+		doubleChangeListenerAry[0] = new ChangeListener<Number>() {
+			@Override
+			public void changed( ObservableValue<? extends Number> observable, Number oldValue, Number newValue ) {
+				property.removeListener( realValListenerAry[0] );
+				property.setValue( axis.toRealValue(
+						newValue == null ? null : newValue.doubleValue() )
+				);
+				property.addListener( realValListenerAry[0] );
+			}
+		};
+		result.addListener(doubleChangeListenerAry[0]);
 
-        realValListenerAry[0] = (observable, oldValue, newValue) -> {
-            result.removeListener(doubleChangeListenerAry[0]);
-            result.setValue(axis.toNumericValue(newValue));
-            result.addListener(doubleChangeListenerAry[0]);
-        };
-        property.addListener(realValListenerAry[0]);
+		realValListenerAry[0] = new ChangeListener<T>() {
+			@Override
+			public void changed( ObservableValue<? extends T> observable, T oldValue, T newValue ) {
+				result.removeListener( doubleChangeListenerAry[0] );
+				result.setValue( axis.toNumericValue( newValue ) );
+				result.addListener( doubleChangeListenerAry[0] );
+			}
+		};
+		property.addListener(realValListenerAry[0]);
 
 		return result;
 	}
