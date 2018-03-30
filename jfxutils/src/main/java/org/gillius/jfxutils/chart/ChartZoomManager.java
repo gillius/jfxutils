@@ -16,18 +16,10 @@
 
 package org.gillius.jfxutils.chart;
 
-import java.lang.reflect.InvocationTargetException;
-
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.Property;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
@@ -43,8 +35,9 @@ import javafx.scene.layout.Pane;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
-
 import org.gillius.jfxutils.EventHandlerManager;
+
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * ChartZoomManager manages a zooming selection rectangle and the bounds of the graph. It can be
@@ -575,19 +568,19 @@ public class ChartZoomManager {
 		yAxisUpperBoundProperty.set(val);
 	}
 
-	private <T> DoubleProperty getLowerBoundProperty(Axis<T> axis) {
+	private static <T> DoubleProperty getLowerBoundProperty( Axis<T> axis ) {
 		return axis instanceof ValueAxis ?
 				((ValueAxis<?>) axis).lowerBoundProperty() :
-				toDoubleProperty(axis, getProperty(axis, "lowerBoundProperty"));
+				toDoubleProperty(axis, ChartZoomManager.<T>getProperty(axis, "lowerBoundProperty") );
 	}
 
-	private <T> DoubleProperty getUpperBoundProperty(Axis<T> axis) {
+	private static <T> DoubleProperty getUpperBoundProperty( Axis<T> axis ) {
 		return axis instanceof ValueAxis ?
 				((ValueAxis<?>) axis).upperBoundProperty() :
-				toDoubleProperty(axis, getProperty(axis, "upperBoundProperty"));
+				toDoubleProperty(axis, ChartZoomManager.<T>getProperty(axis, "upperBoundProperty") );
 	}
 
-	private <T> DoubleProperty toDoubleProperty(Axis<T> axis, Property<T> property) {
+	private static <T> DoubleProperty toDoubleProperty( final Axis<T> axis, Property<T> property ) {
 		final StringProperty stringProperty = new SimpleStringProperty();
 		final DoubleProperty doubleProperty = new SimpleDoubleProperty() {
 			// keep a reference so that the stringProperty doesn't get garbage-collected
@@ -627,11 +620,12 @@ public class ChartZoomManager {
 		return doubleProperty;
 	}
 
-	private <T> Property<T> getProperty(Object object, String method) {
+	@SuppressWarnings( "unchecked" )
+	private static <T> Property<T> getProperty( Object object, String method ) {
 		try {
 			Object result = object.getClass().getMethod(method).invoke(object);
 			return result instanceof Property ? (Property<T>) result : null;
-		} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {}
+		} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ignored ) {}
 
 		return null;
 	}
