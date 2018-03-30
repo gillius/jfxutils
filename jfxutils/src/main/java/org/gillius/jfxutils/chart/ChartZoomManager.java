@@ -26,8 +26,7 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
@@ -42,7 +41,6 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
-import javafx.util.StringConverter;
 
 import org.gillius.jfxutils.EventHandlerManager;
 
@@ -575,59 +573,49 @@ public class ChartZoomManager {
 		yAxisUpperBoundProperty.set(val);
 	}
 
-	private <T> DoubleProperty getLowerBoundProperty(Axis<T> axis) {
+	private static <T> DoubleProperty getLowerBoundProperty(Axis<T> axis) {
 		return axis instanceof ValueAxis ?
 				((ValueAxis<?>) axis).lowerBoundProperty() :
 				toDoubleProperty(axis, getProperty(axis, "lowerBoundProperty"));
 	}
 
-	private <T> DoubleProperty getUpperBoundProperty(Axis<T> axis) {
+	private static <T> DoubleProperty getUpperBoundProperty(Axis<T> axis) {
 		return axis instanceof ValueAxis ?
 				((ValueAxis<?>) axis).upperBoundProperty() :
 				toDoubleProperty(axis, getProperty(axis, "upperBoundProperty"));
 	}
 
-	private <T> DoubleProperty toDoubleProperty(Axis<T> axis, Property<T> property) {
-		final StringProperty stringProperty = new SimpleStringProperty();
-		final DoubleProperty doubleProperty = new SimpleDoubleProperty() {
-			// keep a reference so that the stringProperty doesn't get garbage-collected
-			private final StringProperty stringProp = stringProperty;
+	private static <T> DoubleProperty toDoubleProperty(Axis<T> axis, Property<T> property) {
+		final ChangeListener<Number>[] doubleChangeListenerAry = new ChangeListener[1];
+		final ChangeListener<T>[] realValListenerAry = new ChangeListener[1];
+
+		final DoubleProperty result = new SimpleDoubleProperty() {
+			/** Retain references so that they're not garbage collected. */
+			private final Object[] listeners = new Object[] {
+				doubleChangeListenerAry, realValListenerAry
+			};
 		};
 
-		stringProperty.bindBidirectional(
-			doubleProperty,
-			new StringConverter<Number>() {
-				@Override
-				public String toString(Number val) {
-					return val == null ? null : Double.toString(val.doubleValue());
-				}
+		doubleChangeListenerAry[0] = (observable, oldValue, newValue) -> {
+            property.removeListener(realValListenerAry[0]);
+            property.setValue(axis.toRealValue(
+            	newValue == null ? null : newValue.doubleValue())
+           	);
+            property.addListener(realValListenerAry[0]);
+        };
+        result.addListener(doubleChangeListenerAry[0]);
 
-				@Override
-				public Double fromString(String string) {
-					return string == null ? null : Double.parseDouble(string);
-				}
-			}
-		);
+        realValListenerAry[0] = (observable, oldValue, newValue) -> {
+            result.removeListener(doubleChangeListenerAry[0]);
+            result.setValue(axis.toNumericValue(newValue));
+            result.addListener(doubleChangeListenerAry[0]);
+        };
+        property.addListener(realValListenerAry[0]);
 
-		stringProperty.bindBidirectional(
-			property,
-			new StringConverter<T>() {
-				@Override
-				public String toString(T obj) {
-					return obj == null ? null : Double.toString(axis.toNumericValue(obj));
-				}
-
-				@Override
-				public T fromString(String string) {
-					return string == null ? null : axis.toRealValue(Double.parseDouble(string));
-				}
-			}
-		);
-
-		return doubleProperty;
+		return result;
 	}
 
-	private <T> Property<T> getProperty(Object object, String method) {
+	private static <T> Property<T> getProperty(Object object, String method) {
 		try {
 			Object result = object.getClass().getMethod(method).invoke(object);
 			return result instanceof Property ? (Property<T>) result : null;
