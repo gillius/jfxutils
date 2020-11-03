@@ -81,7 +81,7 @@ for 0.3, I made a release 0.3.1 with the same code that is published at Maven Ce
   <repository>
     <id>gillius-org</id>
     <name>Gillius.org Maven Repository</name>
-    <url>http://www.gillius.org/maven2</url>
+    <url>https://www.gillius.org/maven2</url>
   </repository>
 </repositories>
 ```
@@ -98,8 +98,8 @@ Then add the following to your dependencies section:
 Documentation
 -------------
 
-* Documentation for 1.0: http://gillius.org/jfxutils/docs/latest/
-* Documentation for 0.3/0.3.1: http://gillius.org/jfxutils/docs/0.3/
+* Documentation for 1.0: https://gillius.org/jfxutils/docs/latest/
+* Documentation for 0.3/0.3.1: https://gillius.org/jfxutils/docs/0.3/
 
 Screenshot
 ----------
